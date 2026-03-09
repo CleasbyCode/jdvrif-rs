@@ -1,34 +1,31 @@
 pub(crate) const INFO_TEXT: &str = r#"
 
-JPG Data Vehicle (jdvrif v7.5)
+JPG Data Vehicle (jdvrif v7.6)
 Created by Nicholas Cleasby (@CleasbyCode) 10/04/2023
 
-jdvrif is a metadata "steganography-like" command-line tool used for concealing and extracting
+jdvrif-rs is a metadata "steganography-like" command-line tool used for concealing and extracting
 any file type within and from a JPG image.
 
 ──────────────────────────
 Compile & run (Linux)
 ──────────────────────────
+	
+  $ sudo apt install libsodium-dev libturbojpeg0-dev pkg-config 
+  $ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  $ cargo build --release
 
-  Note: Compiler support for C++23 required.
+  Build complete. Binary at 'target/release/jdvrif-rs'
 
-  $ sudo apt install libsodium-dev libturbojpeg0-dev
-
-  $ chmod +x compile_jdvrif.sh
-  $ ./compile_jdvrif.sh
-
-  Compilation successful. Executable 'jdvrif' created.
-
-  $ sudo cp jdvrif /usr/bin
-  $ jdvrif
+  $ sudo cp target/release/jdvrif-rs /usr/bin
+  $ jdvrif-rs
 
 ──────────────────────────
 Usage
 ──────────────────────────
 
-  jdvrif conceal [-b|-r] <cover_image> <secret_file>
-  jdvrif recover <cover_image>
-  jdvrif --info
+  jdvrif-rs conceal [-b|-r] <cover_image> <secret_file>
+  jdvrif-rs recover <cover_image>
+  jdvrif-rs --info
 
 ──────────────────────────
 Platform compatibility & size limits
@@ -83,7 +80,7 @@ Platform options for conceal mode
 
 -b (Bluesky) : Creates compatible "file-embedded" JPG images for posting on Bluesky.
 
-$ jdvrif conceal -b my_image.jpg hidden.doc
+$ jdvrif-rs conceal -b my_image.jpg hidden.doc
 
 These images are only compatible for posting on Bluesky.
 
@@ -115,7 +112,7 @@ Bluesky size limits: Cover 800 KB / Secret data file (compressed) ~171 KB
 
 -r (Reddit) : Creates compatible "file-embedded" JPG images for posting on Reddit.
 
-$ jdvrif conceal -r my_image.jpg secret.mp3
+$ jdvrif-rs conceal -r my_image.jpg secret.mp3
 
 From the Reddit site, click "Create Post", then select the "Images & Video" tab to attach the JPG image.
 These images are only compatible for posting on Reddit.

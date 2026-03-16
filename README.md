@@ -75,13 +75,17 @@ jdvrif ***conceal*** mode ***platform*** options:
   $ jdvrif-rs conceal -b my_image.jpg hidden.doc
   ```
 \******************   
-***Bluesky*** has recently changed the image format of saved / downloaded images to ***WEBP***.  
+Note: ***Bluesky*** now saves images as ***WEBP*** by default. 
 
-This has made the recovery incompatible for ***jdvrif*** and ***JPG*** images.  
+To save an image as ***JPG***, so that you can still recover concealed data with ***jdvrif***,  
+right-click on an image that you want to save. From the menu, select ***Open image in new tab***.  
 
-I will keep the ***Bluesky*** code in ***jdvrif*** for educational purpopses and just in case ***Bluesky*** goes back to saving images as ***JPG***.  
-       
-If you still want to a tool to conceal data in images posted on ***Bluesky*** you can use my ***WEBP*** steganography CLI tool ***[wbpdv](https://github.com/CleasbyCode/wbpdv)***  
+Select the new tab and within the address bar, move to the end of the address and add ***@jpg*** then hit enter.  
+Right-click the image and from the menu select ***Save image...***  
+
+Your image should now be downloaded as a ***JPG***, which will now work with ***jdvrif***.
+         
+If you want a tool to conceal data using ***WEBP*** images to post on ***Bluesky*** you can use my ***WEBP*** steganography CLI tool ***[wbpdv](https://github.com/CleasbyCode/wbpdv)***  
 \******************
 
  These images are only compatible for posting on ***Bluesky***. Your embedded data file will be removed if posted on a different platform.

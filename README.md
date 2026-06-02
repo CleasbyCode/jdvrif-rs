@@ -12,7 +12,7 @@ Unlike the common steganography method of concealing data within the pixels of a
 
 You can conceal any file type up to ***2GB***, although compatible sites (*listed below*) have their own ***much smaller*** size limits and *other requirements.  
 
-For increased storage capacity and better security, your embedded data file is compressed with ***zlib*** and encrypted using the ***libsodium*** cryptographic library.  
+For increased storage capacity and better security, your embedded data file is compressed (***flate2/zlib***) — unless it's already a compressed file type — and encrypted with ***XChaCha20-Poly1305*** using the ***libsodium*** cryptographic library.
 
 ***jdvrif*** partly derives from the ***[technique implemented](https://www.vice.com/en/article/bj4wxm/tiny-picture-twitter-complete-works-of-shakespeare-steganography)*** by security researcher ***[David Buchanan](https://www.da.vidbuchanan.co.uk/).*** 
 
@@ -46,7 +46,7 @@ Platform compatibility for output image:-
   ✓ ImgPile
   ✓ Flickr
   
-Saved "file-embedded" JPG image: jrif_129462.jpg (143029 bytes).
+Saved "file-embedded" JPG image: jrif_3e1988793.jpg (143029 bytes).
 
 Recovery PIN: [***2166776980318349924***]
 
@@ -54,7 +54,7 @@ Important: Keep your PIN safe, so that you can extract the hidden file.
 
 Complete!
         
-$ jdvrif-rs recover jrif_129462.jpg
+$ jdvrif-rs recover jrif_3e1988793.jpg
 
 PIN: *******************
 

@@ -1,20 +1,20 @@
-# jdvrif_rust
+# jdvrif-rs
 ***This is an experimental Rust port of my C++ steganography tool [***jdvrif***](https://github.com/CleasbyCode/jdvrif)***
 
-***jdvrif*** is a fast, easy-to-use steganography command-line tool for concealing and extracting any file type via a **JPG** image.  
+***jdvrif-rs*** is a fast, easy-to-use steganography command-line tool for concealing and extracting any file type via a **JPG** image.  
 
 There is also a [***Web edition***](https://cleasbycode.co.uk/jdvrif/app/), which you can use immediately, as a convenient alternative to downloading and compiling the CLI source code. Web file uploads are limited to **20MB**.    
 
-![Demo Image](https://github.com/CleasbyCode/jdvrif_rust/blob/main/demo_image/jrif_661748.jpg)  
+![Demo Image](https://github.com/CleasbyCode/jdvrif-rs/blob/main/demo_image/jrif_661748.jpg)  
 *Demo Image: **"A place of concealment"** / ***PIN: 5608171548286279209****
 
-Unlike the common steganography method of concealing data within the pixels of a cover image ([***LSB***](https://ctf101.org/forensics/what-is-stegonagraphy/)), ***jdvrif*** hides files within ***application segments*** of a ***JPG*** image. 
+Unlike the common steganography method of concealing data within the pixels of a cover image ([***LSB***](https://ctf101.org/forensics/what-is-stegonagraphy/)), ***jdvrif-rs*** hides files within ***application segments*** of a ***JPG*** image. 
 
 You can conceal any file type up to ***2GB***, although compatible sites (*listed below*) have their own ***much smaller*** size limits and *other requirements.  
 
 For increased storage capacity and better security, your embedded data file is compressed with ***flate2/zlib*** — unless it's already a compressed file type over 10 MB — and encrypted with ***XChaCha20-Poly1305*** using the ***libsodium*** cryptographic library (via the Rust ***alkali*** bindings).
 
-***jdvrif*** partly derives from the ***[technique implemented](https://www.vice.com/en/article/bj4wxm/tiny-picture-twitter-complete-works-of-shakespeare-steganography)*** by security researcher ***[David Buchanan](https://www.da.vidbuchanan.co.uk/).*** 
+***jdvrif-rs*** partly derives from the ***[technique implemented](https://www.vice.com/en/article/bj4wxm/tiny-picture-twitter-complete-works-of-shakespeare-steganography)*** by security researcher ***[David Buchanan](https://www.da.vidbuchanan.co.uk/).*** 
 
 ## Usage (Linux)
 
@@ -63,12 +63,12 @@ Extracted hidden file: your_secret_file.doc (6165 bytes).
 Complete! Please check your file.
 
 ```
-jdvrif ***mode*** arguments:
+jdvrif-rs ***mode*** arguments:
  
  ***conceal*** - Compresses, encrypts and embeds your secret data file within a ***JPG*** cover image.  
  ***recover*** - Decrypts, uncompresses and extracts the concealed data file from a ***JPG*** cover image.
  
-jdvrif ***conceal*** mode ***platform*** options:
+jdvrif-rs ***conceal*** mode ***platform*** options:
  
 "***-b***" To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Bluesky*** platform, you must use the ***-b*** option with ***conceal*** mode.
   ```console
@@ -77,13 +77,13 @@ jdvrif ***conceal*** mode ***platform*** options:
 \******************   
 Note: ***Bluesky*** now saves images as ***WEBP*** by default. 
 
-To save an image as ***JPG***, so that you can still recover concealed data with ***jdvrif***,  
+To save an image as ***JPG***, so that you can still recover concealed data with ***jdvrif-rs***,  
 right-click on an image that you want to save. From the menu, select ***Open image in new tab***.  
 
 Select the new tab and within the address bar, move to the end of the address and add ***@jpg*** then hit enter.  
 Right-click the image and from the menu select ***Save image...***  
 
-Your image should now be downloaded as a ***JPG***, which will now work with ***jdvrif***.
+Your image should now be downloaded as a ***JPG***, which will now work with ***jdvrif-rs***.
          
 If you want a tool to conceal data using ***WEBP*** images to post on ***Bluesky*** you can use my ***WEBP*** steganography CLI tool ***[wbpdv](https://github.com/CleasbyCode/wbpdv)***  
 \******************

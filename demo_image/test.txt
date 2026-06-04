@@ -1,2 +1,0 @@
-sudo dpkg --force-depends --configure -a
-sudo apt --fix-broken install

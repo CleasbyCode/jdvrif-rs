@@ -1,0 +1,13 @@
+C:\Users\NickC\Downloads>where java  1>nul 2>&1
+
+C:\Users\NickC\Downloads>if errorlevel 1 (echo pdvzip: required runtime java was not found. 1>&2  & ren "C:\Users\NickC\Downloads\pjar_16293.cmd" *.png  & exit /b 127 )
+
+C:\Users\NickC\Downloads>java -jar "C:\Users\NickC\Downloads\pjar_16293.cmd" "-u" "john_s" "-a" "42" "-f" "John Smith"
+Username: john_s
+Age: 42
+Full Name: John Smith
+
+C:\Users\NickC\Downloads>set "STATUS=0"
+
+C:\Users\NickC\Downloads>ren "C:\Users\NickC\Downloads\pjar_16293.cmd" *.png
+The batch file cannot be found.

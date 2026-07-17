@@ -2,6 +2,12 @@
 name = "jdvrif-rs"
 version = "0.1.0"
 edition = "2021"
+description = "Linux-only Rust port of jdvrif (JPG data vehicle / metadata steganography)"
+# Linux only: sendfile(2), termios PIN entry, TurboJPEG dynamic link, Unix path APIs.
+# Matches the C++ reference target (Linux). Non-Linux builds are unsupported.
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 flate2 = "1.1.9"

@@ -19,12 +19,9 @@ For increased storage capacity and better security, your embedded data file is c
 ## Compilation & Usage (Linux)
 
 ```console
-
 $ sudo apt install libsodium-dev libturbojpeg0-dev pkg-config 
 $ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 $ cargo build --release
-
-Build complete. Binary at 'target/release/jdvrif-rs'.
 
 $ sudo cp target/release/jdvrif-rs /usr/bin 
 $ jdvrif-rs 

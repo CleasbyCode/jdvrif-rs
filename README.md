@@ -16,7 +16,7 @@ For increased storage capacity and better security, your embedded data file is c
 
 ***jdvrif-rs*** partly derives from the ***[technique implemented](https://www.vice.com/en/article/bj4wxm/tiny-picture-twitter-complete-works-of-shakespeare-steganography)*** by security researcher ***[David Buchanan](https://www.da.vidbuchanan.co.uk/).*** 
 
-## Usage (Linux)
+## Compilation & Usage (Linux)
 
 ```console
 

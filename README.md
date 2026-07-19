@@ -150,7 +150,7 @@ https://github.com/user-attachments/assets/f56f54bb-658f-4b0e-a2f3-7d3428333304
 
 ## Third-Party Software
 
-  ***JDVRIF*** Rust port uses the following third-party software:
+  ***jdvrif-rs*** uses the following third-party software:
 
   ### Native libraries
 

@@ -148,20 +148,55 @@ https://github.com/user-attachments/assets/b4c72ea7-40e3-49b0-89aa-ae2dd8ccccb9
 
 https://github.com/user-attachments/assets/f56f54bb-658f-4b0e-a2f3-7d3428333304
 
-## Third-Party Libraries
+## Third-Party Software
 
-This project makes use of the following third-party libraries:
+  ***JDVRIF*** Rust port uses the following third-party software:
 
-- **libsodium**: For cryptographic functions.
-  - [**LICENSE**](https://github.com/jedisct1/libsodium/blob/master/LICENSE)
-  - Copyright (C) 2013-2025 Frank Denis (github@pureftpd.org)
-- libjpeg-turbo (see [***LICENSE***](https://github.com/libjpeg-turbo/libjpeg-turbo/blob/main/LICENSE.md) file)  
-  - {This software is based in part on the work of the Independent JPEG Group.}
-  - Copyright (C) 2009-2024 D. R. Commander. All Rights Reserved.
-  - Copyright (C) 2015 Viktor Szathmáry. All Rights Reserved.
-- **zlib**: General-purpose compression library
-  - License: zlib/libpng license (see [***LICENSE***](https://github.com/madler/zlib/blob/develop/LICENSE) file)
-  - Copyright (C) 1995-2024 Jean-loup Gailly and Mark Adler
+  ### Native libraries
+
+  - [libsodium](https://github.com/jedisct1/libsodium) — cryptographic operations.
+    License: [ISC](https://github.com/jedisct1/libsodium/blob/master/LICENSE).
+
+  - [libjpeg-turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) (TurboJPEG API) — JPEG
+  processing and lossless transformation.
+    Licenses: [Independent JPEG Group License and Modified BSD 3-Clause License](https://github.com/
+    libjpeg-turbo/libjpeg-turbo/blob/main/LICENSE.md).
+
+    This software is based in part on the work of the Independent JPEG Group.
+
+  ### Rust dependencies
+
+  - [alkali](https://github.com/tom25519/alkali) — safe Rust bindings to libsodium.
+    License: MIT OR Apache-2.0.
+    Uses [libsodium-sys-stable](https://github.com/jedisct1/libsodium-sys-stable), licensed under
+    MIT OR Apache-2.0.
+
+  - [flate2](https://github.com/rust-lang/flate2-rs) — DEFLATE/zlib-stream compression and
+  decompression.
+    License: MIT OR Apache-2.0.
+    Uses the pure-Rust [miniz_oxide](https://github.com/Frommi/miniz_oxide) backend, licensed under
+    MIT OR zlib OR Apache-2.0.
+
+  - [libc](https://github.com/rust-lang/libc) — Linux/POSIX and C FFI bindings.
+    License: MIT OR Apache-2.0.
+
+  - [zeroize](https://github.com/RustCrypto/utils/tree/master/zeroize) — clearing sensitive values
+  from memory.
+    License: MIT OR Apache-2.0.
+
+  ### Incorporated assets
+
+  - [Compact ICC Profiles](https://github.com/saucecontrol/Compact-ICC-Profiles) — modified
+  `AdobeCompat-v4.icc` profile embedded in the default JPEG metadata template.
+    License: CC0 1.0.
+
+  ### Optional Bluesky posting helper
+
+  The optional `bsky_post.py` helper uses:
+
+  - [Requests](https://github.com/psf/requests) — Apache License 2.0.
+  - [Beautiful Soup 4](https://pypi.org/project/beautifulsoup4/) — MIT License.
+  - [Pillow](https://github.com/python-pillow/Pillow) — MIT-CMU License.
     
 ##
 

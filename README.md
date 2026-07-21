@@ -158,15 +158,25 @@ https://github.com/user-attachments/assets/f56f54bb-658f-4b0e-a2f3-7d3428333304
 
   ### Native libraries
 
-  - [libsodium](https://github.com/jedisct1/libsodium) — cryptographic operations.
-    License: [ISC](https://github.com/jedisct1/libsodium/blob/master/LICENSE).
+  - [libsodium](https://github.com/jedisct1/libsodium) — Cryptographic random generation, password hashing, authenticated encryption, secure
+    memory clearing, and Base64 decoding.
+    License: [ISC](https://github.com/jedisct1/libsodium/blob/master/LICENSE)
 
-  - [libjpeg-turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) (TurboJPEG API) — JPEG
-  processing and lossless transformation.
-    Licenses: [Independent JPEG Group License and Modified BSD 3-Clause License](https://github.com/
-    libjpeg-turbo/libjpeg-turbo/blob/main/LICENSE.md).
+    Copyright (c) 2013–2026 Frank Denis.
 
-    This software is based in part on the work of the Independent JPEG Group.
+ - [libjpeg-turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) 2.1.5
+    (TurboJPEG API) — JPEG processing and lossless transformation.
+
+      Copyright © 1991–2020 Thomas G. Lane and Guido Vollbeding.
+   
+      Copyright © 2009–2023 D. R. Commander. All Rights Reserved.
+   
+      Copyright © 2015 Viktor Szathmáry. All Rights Reserved.
+   
+      Licenses: [Independent JPEG Group License, Modified BSD 3-Clause License,
+      and zlib License](https://github.com/libjpeg-turbo/libjpeg-turbo/blob/2.1.5/LICENSE.md).
+
+      This software is based in part on the work of the Independent JPEG Group.
 
   ### Rust dependencies
 
@@ -190,17 +200,33 @@ https://github.com/user-attachments/assets/f56f54bb-658f-4b0e-a2f3-7d3428333304
 
   ### Incorporated assets
 
-  - [Compact ICC Profiles](https://github.com/saucecontrol/Compact-ICC-Profiles) — modified
-  `AdobeCompat-v4.icc` profile embedded in the default JPEG metadata template.
-    License: CC0 1.0.
+  - [Compact ICC Profiles](https://github.com/saucecontrol/Compact-ICC-Profiles) — embedded Adobe-
+  compatible ICC profile.
+    License: [CC0 1.0 Universal](https://github.com/saucecontrol/Compact-ICC-Profiles/blob/master/license)
 
   ### Optional Bluesky posting helper
 
-  The optional `bsky_post.py` helper uses:
+  - Bryan Newbold / ATProto Hacker Cookbook — create_bsky_post.py — Basis for the [forked](https://gist.github.com/CleasbyCode/1eb678ca1fa1975b1c1e20aeec33637e) Bluesky posting helper (src/bsky/bsky_post.py). 
+    For reference see the [Cookbook copy](https://github.com/bluesky-social/cookbook/blob/main/python-bsky-post/create_bsky_post.py)
+    License: [CC0 1.0 Universal](https://github.com/bluesky-social/cookbook/blob/main/LICENSE-CC0).
 
-  - [Requests](https://github.com/psf/requests) — Apache License 2.0.
-  - [Beautiful Soup 4](https://pypi.org/project/beautifulsoup4/) — MIT License.
-  - [Pillow](https://github.com/python-pillow/Pillow) — MIT-CMU License.
+  - Requests — HTTP and Bluesky API requests.
+    License: [Apache 2.0](https://github.com/psf/requests/blob/main/LICENSE)
+    [NOTICE](https://github.com/psf/requests/blob/main/NOTICE)
+    
+    Copyright 2019 Kenneth Reitz.
+
+  - Beautiful Soup 4 — HTML and Open Graph metadata parsing.
+    License: [MIT](https://pypi.org/project/beautifulsoup4/)
+    
+    Copyright (c) Leonard Richardson.
+
+  - Pillow — Image validation, dimensions, and aspect-ratio handling.
+    License: [MIT-CMU](https://github.com/python-pillow/Pillow/blob/main/LICENSE)
+    
+    PIL copyright © 1997–2011 Secret Labs AB and © 1995–2011 Fredrik Lundh and contributors.
+    
+    Pillow copyright © 2010 Jeffrey “Alex” Clark and contributors.
     
 ##
 

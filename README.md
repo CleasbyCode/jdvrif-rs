@@ -19,8 +19,8 @@ For increased storage capacity and better security, your embedded data file is c
 ## Compilation & Usage (Linux)
 
 ```console
-$ sudo apt-get update
-$ sudo apt-get install build-essential curl pkg-config libsodium-dev libturbojpeg0-dev
+$ sudo apt update
+$ sudo apt install build-essential curl pkg-config libsodium-dev libturbojpeg0-dev
 
 $ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 $ source "$HOME/.cargo/env"
@@ -152,76 +152,83 @@ https://github.com/user-attachments/assets/b4c72ea7-40e3-49b0-89aa-ae2dd8ccccb9
 
 https://github.com/user-attachments/assets/f56f54bb-658f-4b0e-a2f3-7d3428333304
 
-## Third-Party Software
+## Third-Party Software and Assets
 
-  ***jdvrif-rs*** uses the following third-party software:
+  ### Core applications
 
-  ### Native libraries
+   - [libsodium](https://github.com/jedisct1/libsodium) — cryptographic random generation, Argon2id
+  key derivation and XChaCha20-Poly1305 secret streams. Dynamically linked as a system library.
+      
+      License: [ISC License](https://github.com/jedisct1/libsodium/blob/master/LICENSE)
+    
+      Copyright (c) 2013–2026 Frank Denis.
+    
+ - [libjpeg-turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) — JPEG processing and lossless transformation. Dynamically linked as a system library.
 
-  - [libsodium](https://github.com/jedisct1/libsodium) — Cryptographic random generation, password hashing, authenticated encryption, secure
-    memory clearing, and Base64 decoding.
-    License: [ISC](https://github.com/jedisct1/libsodium/blob/master/LICENSE)
+      This software is based in part on the work of the Independent JPEG Group.
 
-    Copyright (c) 2013–2026 Frank Denis.
-
- - [libjpeg-turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) 2.1.5
-    (TurboJPEG API) — JPEG processing and lossless transformation.
+      Licenses: [Independent JPEG Group License, Modified BSD 3-Clause License,
+      and zlib License](https://github.com/libjpeg-turbo/libjpeg-turbo/blob/2.1.5/LICENSE.md).
 
       Copyright © 1991–2020 Thomas G. Lane and Guido Vollbeding.
    
       Copyright © 2009–2023 D. R. Commander. All Rights Reserved.
    
       Copyright © 2015 Viktor Szathmáry. All Rights Reserved.
-   
-      Licenses: [Independent JPEG Group License, Modified BSD 3-Clause License,
-      and zlib License](https://github.com/libjpeg-turbo/libjpeg-turbo/blob/2.1.5/LICENSE.md).
-
-      This software is based in part on the work of the Independent JPEG Group.
 
   ### Rust dependencies
 
   - [alkali](https://github.com/tom25519/alkali) — safe Rust bindings to libsodium.
-    License: MIT OR Apache-2.0.
-    Uses [libsodium-sys-stable](https://github.com/jedisct1/libsodium-sys-stable), licensed under
-    MIT OR Apache-2.0.
+    Uses [libsodium-sys-stable](https://github.com/jedisct1/libsodium-sys-stable).
+    
+    License: [MIT](https://github.com/jedisct1/libsodium-sys-stable/blob/master/LICENSE-MIT) OR [Apache-2.0](https://github.com/jedisct1/libsodium-sys-stable/blob/master/LICENSE-APACHE)
 
   - [flate2](https://github.com/rust-lang/flate2-rs) — DEFLATE/zlib-stream compression and
   decompression.
-    License: MIT OR Apache-2.0.
-    Uses the pure-Rust [miniz_oxide](https://github.com/Frommi/miniz_oxide) backend, licensed under
-    MIT OR zlib OR Apache-2.0.
+
+    License: [MIT](https://github.com/rust-lang/flate2-rs/blob/main/LICENSE-MIT) OR [Apache-2.0](https://github.com/rust-lang/flate2-rs/blob/main/LICENSE-APACHE)
+    
+    Uses the pure-Rust [miniz_oxide](https://github.com/Frommi/miniz_oxide) backend.
+    
+    License: [MIT](https://github.com/Frommi/miniz_oxide/blob/master/LICENSE-MIT.md)
 
   - [libc](https://github.com/rust-lang/libc) — Linux/POSIX and C FFI bindings.
-    License: MIT OR Apache-2.0.
+    
+    License: [MIT](https://github.com/rust-lang/libc/blob/main/LICENSE-MIT) OR [Apache-2.0](https://github.com/rust-lang/libc/blob/main/LICENSE-APACHE)
 
   - [zeroize](https://github.com/RustCrypto/utils/tree/master/zeroize) — clearing sensitive values
   from memory.
-    License: MIT OR Apache-2.0.
+
+    License: [MIT](https://github.com/RustCrypto/utils/blob/master/zeroize/LICENSE-MIT) OR [Apache-2.0](https://github.com/RustCrypto/utils/blob/master/zeroize/LICENSE-APACHE)
 
   ### Incorporated assets
 
   - [Compact ICC Profiles](https://github.com/saucecontrol/Compact-ICC-Profiles) — embedded Adobe-
   compatible ICC profile.
+
     License: [CC0 1.0 Universal](https://github.com/saucecontrol/Compact-ICC-Profiles/blob/master/license)
 
-  ### Optional Bluesky posting helper
+   ### Optional Bluesky posting helper
 
   - Bryan Newbold / ATProto Hacker Cookbook — create_bsky_post.py — Basis for the [forked](https://gist.github.com/CleasbyCode/1eb678ca1fa1975b1c1e20aeec33637e) Bluesky posting helper (src/bsky/bsky_post.py). 
     For reference see the [Cookbook copy](https://github.com/bluesky-social/cookbook/blob/main/python-bsky-post/create_bsky_post.py)
+
     License: [CC0 1.0 Universal](https://github.com/bluesky-social/cookbook/blob/main/LICENSE-CC0).
 
   - Requests — HTTP and Bluesky API requests.
-    License: [Apache 2.0](https://github.com/psf/requests/blob/main/LICENSE)
-    [NOTICE](https://github.com/psf/requests/blob/main/NOTICE)
+
+    License: [Apache 2.0](https://github.com/psf/requests/blob/main/LICENSE) / [NOTICE](https://github.com/psf/requests/blob/main/NOTICE)
     
     Copyright 2019 Kenneth Reitz.
 
   - Beautiful Soup 4 — HTML and Open Graph metadata parsing.
+
     License: [MIT](https://pypi.org/project/beautifulsoup4/)
     
     Copyright (c) Leonard Richardson.
 
   - Pillow — Image validation, dimensions, and aspect-ratio handling.
+
     License: [MIT-CMU](https://github.com/python-pillow/Pillow/blob/main/LICENSE)
     
     PIL copyright © 1997–2011 Secret Labs AB and © 1995–2011 Fredrik Lundh and contributors.

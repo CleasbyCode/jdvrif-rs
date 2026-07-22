@@ -181,12 +181,12 @@ https://github.com/user-attachments/assets/f56f54bb-658f-4b0e-a2f3-7d3428333304
   - [alkali](https://github.com/tom25519/alkali) — safe Rust bindings to libsodium.
     Uses [libsodium-sys-stable](https://github.com/jedisct1/libsodium-sys-stable).
     
-    License: [MIT](https://github.com/jedisct1/libsodium-sys-stable/blob/master/LICENSE-MIT) OR [Apache-2.0](https://github.com/jedisct1/libsodium-sys-stable/blob/master/LICENSE-APACHE)
+    License: [MIT](https://github.com/jedisct1/libsodium-sys-stable/blob/master/LICENSE-MIT) / [Apache-2.0](https://github.com/jedisct1/libsodium-sys-stable/blob/master/LICENSE-APACHE)
 
   - [flate2](https://github.com/rust-lang/flate2-rs) — DEFLATE/zlib-stream compression and
   decompression.
 
-    License: [MIT](https://github.com/rust-lang/flate2-rs/blob/main/LICENSE-MIT) OR [Apache-2.0](https://github.com/rust-lang/flate2-rs/blob/main/LICENSE-APACHE)
+    License: [MIT](https://github.com/rust-lang/flate2-rs/blob/main/LICENSE-MIT) / [Apache-2.0](https://github.com/rust-lang/flate2-rs/blob/main/LICENSE-APACHE)
     
     Uses the pure-Rust [miniz_oxide](https://github.com/Frommi/miniz_oxide) backend.
     
@@ -194,12 +194,12 @@ https://github.com/user-attachments/assets/f56f54bb-658f-4b0e-a2f3-7d3428333304
 
   - [libc](https://github.com/rust-lang/libc) — Linux/POSIX and C FFI bindings.
     
-    License: [MIT](https://github.com/rust-lang/libc/blob/main/LICENSE-MIT) OR [Apache-2.0](https://github.com/rust-lang/libc/blob/main/LICENSE-APACHE)
+    License: [MIT](https://github.com/rust-lang/libc/blob/main/LICENSE-MIT) / [Apache-2.0](https://github.com/rust-lang/libc/blob/main/LICENSE-APACHE)
 
   - [zeroize](https://github.com/RustCrypto/utils/tree/master/zeroize) — clearing sensitive values
   from memory.
 
-    License: [MIT](https://github.com/RustCrypto/utils/blob/master/zeroize/LICENSE-MIT) OR [Apache-2.0](https://github.com/RustCrypto/utils/blob/master/zeroize/LICENSE-APACHE)
+    License: [MIT](https://github.com/RustCrypto/utils/blob/master/zeroize/LICENSE-MIT) / [Apache-2.0](https://github.com/RustCrypto/utils/blob/master/zeroize/LICENSE-APACHE)
 
   ### Incorporated assets
 

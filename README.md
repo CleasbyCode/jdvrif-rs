@@ -30,7 +30,7 @@ $ cargo build --release --locked
 $ sudo cp target/release/jdvrif-rs /usr/bin 
 $ jdvrif-rs 
 
-Usage: jdvrif-rs conceal [-b|-r] <cover_image> <secret_file>
+Usage: jdvrif-rs conceal [-b] <cover_image> <secret_file>
        jdvrif-rs recover <cover_image>  
        jdvrif-rs --info
 
@@ -106,7 +106,7 @@ https://github.com/user-attachments/assets/b2cc33ff-b2c2-46c2-960b-f7b9ba65223d
 *Posting size limit measured by the ***combined*** size of the ***cover image*** + ***compressed data file:****  
 
 ● ***Flickr*** (**200MB**), ***ImgPile*** (**100MB**), ***ImgBB*** (**32MB**),  
-● ***PostImage*** (**32MB**), ***Reddit*** (**20MB** | ***-r option***), ***Pixelfed*** (**15MB**).
+● ***PostImage*** (**32MB**), ***Pixelfed*** (**15MB**).
 
 *Size limit measured ***only*** by the ***compressed data file size:****  
 
@@ -121,18 +121,6 @@ For example, with ***Mastodon***, if your cover image is **1MB** you can still e
 For platforms such as ***X-Twitter*** & ***Tumblr***, which have small size limits, you may want to focus on data that compress well, such as text files, etc.   
 
 https://github.com/user-attachments/assets/b4c72ea7-40e3-49b0-89aa-ae2dd8ccccb9 
-
-   "***-r***" - To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Reddit*** platform, you must use the ***-r*** option with ***conceal*** mode.
-   ```console
-  $ jdvrif-rs conceal -r my_image.jpg secret.mp3 
-   ```
-   From the ***Reddit*** site, select "***Create Post***" followed by "***Images & Video***" tab, to attach and post your ***JPG*** image.
-  
-   These images are only compatible for posting on ***Reddit***. Your embedded data file will be removed if posted on a different platform.
-  
- To correctly download images from ***X-Twitter*** or ***Reddit***, click the image in the post to fully expand it, before saving.
-
-https://github.com/user-attachments/assets/f56f54bb-658f-4b0e-a2f3-7d3428333304
 
 ## Third-Party Software and Assets
 

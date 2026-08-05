@@ -1,0 +1,29 @@
+
+----
+The 0–5 dial is a cooling power or intensity scale, not a direct temperature setting. 
+
+Higher numbers mean the compressor works harder and longer to remove heat, resulting in a colder fridge. 
+
+A setting of 2 provides minimal cooling power (leading to an unsafe 11°C), while 5 provides maximum power to reach a safe 4°C.
+
+How the Dial Works
+
+0: The cooling system is turned off.
+
+1–2: Low cooling power, minimal compressor runtime (results in a warmer interior).
+
+3–4: Medium power, usually ideal for normal room temperatures and full loads.
+
+5: Maximum cooling power, continuous or heavy compressor runtime (achieves your ideal 4°C).
+
+Why Setting 2 Leaves Your Fridge at 11°C 
+
+Ambient temperature: If your kitchen or the room where the fridge sits is warm, a low power setting (2) 
+cannot pull enough heat out of the cabinet.
+
+Under-loading or airflow: A very empty fridge loses its "cold mass" every time the door opens, and a low setting lacks the power to recover quickly.
+
+Thermostat calibration: The internal thermostat sensor may be slightly lazy or miscalibrated, meaning it requires a high physical setting (5) just to keep the compressor running long enough to hit a proper food-safe zone below 5°C.
+----
+
+My notes: Probably a setting of 4 would be idea. 5 is probably making the fridge work too hard, using up more electricity. 

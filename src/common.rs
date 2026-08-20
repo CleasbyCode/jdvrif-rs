@@ -1,0 +1,447 @@
+use std::fs::{self, File, OpenOptions};
+use std::io::BufWriter;
+use std::os::fd::IntoRawFd;
+use std::os::unix::ffi::OsStrExt;
+use std::os::unix::fs::OpenOptionsExt;
+use std::path::Path;
+
+use crate::constants::{CORRUPT_FILE_ERROR, MAX_FILE_SIZE, MAX_IMAGE_SIZE, MINIMUM_IMAGE_SIZE};
+
+/// Close `file`, surfacing an error the kernel only reports at `close(2)`.
+///
+/// `File`'s `Drop` closes the descriptor and discards the result, so a write
+/// error the filesystem defers to close (NFS, delayed-allocation ENOSPC/EDQUOT)
+/// would otherwise vanish and let the caller announce success over a truncated
+/// file. `Write::flush` on a `File` is a no-op and does not help. With
+/// `durable`, fsync first so the bytes are on stable storage before the caller
+/// reports success. Matches the C++ `OutputFile::close`, which checks
+/// `::close`'s return.
+pub(crate) fn finish_file(file: File, error_message: &str, durable: bool) -> Result<(), String> {
+    if durable {
+        file.sync_all().map_err(|_| error_message.to_string())?;
+    }
+    let fd = file.into_raw_fd();
+    // SAFETY: `fd` was just taken from an owned File, so it is open, valid and
+    // not closed anywhere else. On Linux close(2) releases the descriptor even
+    // when it reports an error, so this must not be retried on EINTR.
+    let rc = unsafe { libc::close(fd) };
+    if rc != 0 {
+        return Err(error_message.to_string());
+    }
+    Ok(())
+}
+
+/// Flush a `BufWriter` and close its file with the same guarantees as
+/// [`finish_file`].
+pub(crate) fn finish_buffered_file(
+    writer: BufWriter<File>,
+    error_message: &str,
+    durable: bool,
+) -> Result<(), String> {
+    let file = writer
+        .into_inner()
+        .map_err(|_| error_message.to_string())?;
+    finish_file(file, error_message, durable)
+}
+
+/// Best-effort fsync of the directory holding `path`, so a freshly created link
+/// survives a crash. Failure is not fatal: some filesystems refuse directory
+/// fsync, and the file contents are already durable by this point.
+pub(crate) fn sync_parent_directory_no_throw(path: &Path) {
+    let parent = path.parent().unwrap_or_else(|| Path::new(""));
+    let dir = if parent.as_os_str().is_empty() {
+        Path::new(".")
+    } else {
+        parent
+    };
+    if let Ok(handle) = File::open(dir) {
+        let _ = handle.sync_all();
+    }
+}
+
+// Rejects path separators, the Windows-reserved punctuation, C0 controls and DEL.
+fn is_valid_filename_char(c: u8) -> bool {
+    const REJECTED: &[u8] = br#"/\:*?"<>|"#;
+    c >= 0x20 && c != 0x7F && !REJECTED.contains(&c)
+}
+
+pub(crate) fn is_reserved_embedded_filename(filename: &[u8]) -> bool {
+    if filename == b"." || filename == b".." {
+        return true;
+    }
+    if filename.is_empty() {
+        return false;
+    }
+    let first = filename[0];
+    let last = *filename.last().unwrap();
+    first == b'.' || first == b'-' || last == b' ' || last == b'.'
+}
+
+pub(crate) fn has_safe_embedded_filename(path: &Path) -> bool {
+    let Some(name) = path.file_name() else {
+        return false;
+    };
+    let bytes = name.as_bytes();
+    if bytes.is_empty() {
+        return false;
+    }
+    bytes.iter().copied().all(is_valid_filename_char) && !is_reserved_embedded_filename(bytes)
+}
+
+pub(crate) fn has_valid_filename(path: &Path) -> bool {
+    let Some(name) = path.file_name() else {
+        return false;
+    };
+    let bytes = name.as_bytes();
+    !bytes.is_empty() && bytes.iter().copied().all(is_valid_filename_char)
+}
+
+pub(crate) fn has_file_extension(path: &Path, exts: &[&str]) -> bool {
+    let ext = path
+        .extension()
+        .map(|v| v.to_string_lossy().to_ascii_lowercase())
+        .unwrap_or_default();
+    exts.iter().any(|e| ext == *e)
+}
+
+pub(crate) fn validate_file_for_read(
+    path: &Path,
+    is_image: bool,
+    is_cover_image: bool,
+) -> Result<usize, String> {
+    if !has_valid_filename(path) {
+        return Err(
+            "Invalid Input Error: Unsupported control or path-separator characters in filename arguments.".to_string(),
+        );
+    }
+
+    let metadata = fs::metadata(path).map_err(|_| {
+        format!(
+            "Error: File \"{}\" not found or not a regular file.",
+            path.to_string_lossy()
+        )
+    })?;
+    if !metadata.is_file() {
+        return Err(format!(
+            "Error: File \"{}\" not found or not a regular file.",
+            path.to_string_lossy()
+        ));
+    }
+
+    let file_size = metadata.len();
+    if file_size == 0 {
+        return Err("Error: File is empty.".to_string());
+    }
+
+    if is_image {
+        if is_cover_image {
+            // Conceal cover image: JPEG variants only (matches C++).
+            if !has_file_extension(path, &["jpg", "jpeg", "jfif"]) {
+                return Err("File Type Error: Invalid image extension. Only expecting \".jpg\", \".jpeg\", \".jfif\".".to_string());
+            }
+            if file_size < MINIMUM_IMAGE_SIZE {
+                return Err("File Error: Invalid image file size.".to_string());
+            }
+            if file_size > MAX_IMAGE_SIZE {
+                return Err(
+                    "Image File Error: Cover image file exceeds maximum size limit.".to_string(),
+                );
+            }
+        } else if !has_file_extension(path, &["jpg", "jpeg", "jfif", "png"]) {
+            // Recovery accepts ".png" too: recover only scans the file's bytes for
+            // the embedded signature, so a jdvrif image served/renamed as ".png"
+            // can still be recovered.
+            return Err("File Type Error: Invalid image extension. Only expecting \".jpg\", \".jpeg\", \".jfif\" or \".png\".".to_string());
+        }
+    }
+
+    if file_size > MAX_FILE_SIZE {
+        return Err("Error: File exceeds program size limit.".to_string());
+    }
+
+    usize::try_from(file_size).map_err(|_| "Error: File is too large for this build.".to_string())
+}
+
+pub(crate) fn checked_file_size(
+    path: &Path,
+    error_message: &str,
+    require_non_empty: bool,
+) -> Result<usize, String> {
+    let size = fs::metadata(path)
+        .map_err(|_| error_message.to_string())?
+        .len();
+    let size_usize = usize::try_from(size).map_err(|_| error_message.to_string())?;
+    if require_non_empty && size_usize == 0 {
+        return Err(error_message.to_string());
+    }
+    Ok(size_usize)
+}
+
+pub(crate) fn open_binary_input_or_throw(path: &Path, error_message: &str) -> Result<File, String> {
+    File::open(path).map_err(|_| error_message.to_string())
+}
+
+/// Create a new exclusive output file with mode `0600` (O_CREAT|O_EXCL).
+/// Create a brand new regular file with `O_EXCL` at mode 0600. The mode is
+/// applied at `open(2)` time, so the file is never group/world-readable -- the
+/// single exclusive-create used by the no-replace commit paths. The raw
+/// `io::Error` is returned so callers can tell "the name is taken" (which is a
+/// normal outcome they retry past) from a real failure.
+pub(crate) fn create_new_owner_only(path: &Path) -> std::io::Result<File> {
+    OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(path)
+}
+
+/// Truncating write-open of a file that already exists -- specifically a
+/// [`StagingFile`] addressed through `/proc/self/fd`, where the inode is created
+/// up front and the exclusive-create helper above would fail with `EEXIST`.
+pub(crate) fn open_binary_output_for_staging_or_throw(path: &Path) -> Result<File, String> {
+    OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open(path)
+        .map_err(|_| {
+            "Write Error: Unable to write to file. Make sure you have WRITE permissions for this location.".to_string()
+        })
+}
+
+/// Link-free scratch inode (`O_TMPFILE`, or create-and-unlink). Invisible in
+/// directory listings and gone on last close. Writers must use the staging
+/// open path because the inode already exists. Mirrors the C++ `StagingFile`.
+pub(crate) struct StagingFile {
+    // Keeps the descriptor (and therefore the inode) alive; the path below
+    // refers to it. Dropping this releases the blocks. Opened O_RDWR on both
+    // creation paths, so the commit copy path can read the contents back.
+    file: File,
+    path: std::path::PathBuf,
+    can_link: bool,
+}
+
+impl StagingFile {
+    /// `parent_dir` selects the filesystem; empty means the current directory.
+    pub(crate) fn new(parent_dir: &Path, tag: &str) -> Result<StagingFile, String> {
+        const STAGING_CREATE_ERROR: &str =
+            "Write Error: Unable to create a private staging file. Make sure you have WRITE permissions for this location.";
+
+        let dir = if parent_dir.as_os_str().is_empty() {
+            Path::new(".")
+        } else {
+            parent_dir
+        };
+
+        // Only an O_TMPFILE inode still has a link to spend (see `can_link`).
+        let (file, can_link) = match open_tmpfile(dir) {
+            Some(f) => (f, true),
+            None => (open_unlinked_named_staging(dir, tag, STAGING_CREATE_ERROR)?, false),
+        };
+
+        let fd = std::os::fd::AsRawFd::as_raw_fd(&file);
+        Ok(StagingFile {
+            file,
+            path: std::path::PathBuf::from(format!("/proc/self/fd/{fd}")),
+            can_link,
+        })
+    }
+
+    /// `/proc/self/fd/N` -- valid for as long as this value lives.
+    pub(crate) fn path(&self) -> &Path {
+        &self.path
+    }
+
+    pub(crate) fn fd(&self) -> i32 {
+        std::os::fd::AsRawFd::as_raw_fd(&self.file)
+    }
+
+    /// True when the inode can still be given a name with `linkat(2)` -- i.e.
+    /// it came from `O_TMPFILE`. The create-and-unlink fallback already spent
+    /// its only link, so such an inode can never be re-linked and its contents
+    /// have to be copied out instead.
+    pub(crate) fn can_link(&self) -> bool {
+        self.can_link
+    }
+}
+
+/// `O_TMPFILE`: a nameless inode on `dir`'s filesystem. `None` when the kernel
+/// or filesystem does not support it, so the caller can fall back.
+fn open_tmpfile(dir: &Path) -> Option<File> {
+    use std::os::fd::FromRawFd;
+
+    let c_dir = std::ffi::CString::new(dir.as_os_str().as_bytes()).ok()?;
+    // O_RDWR so a /proc/self/fd reopen is permitted in either direction.
+    // SAFETY: c_dir is a valid NUL-terminated path for the duration of the call.
+    let fd = unsafe {
+        libc::open(
+            c_dir.as_ptr(),
+            libc::O_RDWR | libc::O_TMPFILE | libc::O_CLOEXEC,
+            0o600 as libc::c_int,
+        )
+    };
+    if fd < 0 {
+        return None;
+    }
+    // SAFETY: fd was just returned by a successful open(2) and is owned here.
+    Some(unsafe { File::from_raw_fd(fd) })
+}
+
+/// Named-and-immediately-unlinked fallback for filesystems that reject
+/// `O_TMPFILE`. The name exists only between `open(2)` and `unlink(2)`; after
+/// that the inode is link-free, exactly as in the `O_TMPFILE` case.
+fn open_unlinked_named_staging(dir: &Path, tag: &str, err: &str) -> Result<File, String> {
+    const MAX_ATTEMPTS: usize = 1024;
+
+    let staging_path = crate::paths::unique_randomized_path_or_throw(
+        dir,
+        &format!(".jdvrif_{tag}_"),
+        ".tmp",
+        MAX_ATTEMPTS,
+        err,
+    )?;
+
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(&staging_path)
+        .map_err(|_| err.to_string())?;
+
+    // Refuse to proceed with a file we cannot detach: leaving a named plaintext
+    // temporary behind is the exact exposure this type exists to remove.
+    if fs::remove_file(&staging_path).is_err() {
+        drop(file);
+        cleanup_path_no_throw(&staging_path);
+        return Err(err.to_string());
+    }
+    Ok(file)
+}
+
+pub(crate) fn cleanup_path_no_throw(path: &Path) {
+    let _ = fs::remove_file(path);
+}
+
+pub(crate) fn span_has_range(data_len: usize, index: usize, length: usize) -> bool {
+    index <= data_len && length <= data_len.saturating_sub(index)
+}
+
+pub(crate) fn get_value(data: &[u8], index: usize, length: usize) -> Result<usize, String> {
+    if !span_has_range(data.len(), index, length) {
+        return Err(CORRUPT_FILE_ERROR.to_string());
+    }
+
+    let val = match length {
+        2 => u16::from_be_bytes([data[index], data[index + 1]]) as usize,
+        4 => u32::from_be_bytes([
+            data[index],
+            data[index + 1],
+            data[index + 2],
+            data[index + 3],
+        ]) as usize,
+        8 => u64::from_be_bytes([
+            data[index],
+            data[index + 1],
+            data[index + 2],
+            data[index + 3],
+            data[index + 4],
+            data[index + 5],
+            data[index + 6],
+            data[index + 7],
+        ]) as usize,
+        _ => return Err(CORRUPT_FILE_ERROR.to_string()),
+    };
+
+    Ok(val)
+}
+
+pub(crate) fn update_value(
+    data: &mut [u8],
+    index: usize,
+    value: usize,
+    length: usize,
+) -> Result<(), String> {
+    if !span_has_range(data.len(), index, length) {
+        return Err("Internal Error: Segment metadata index out of range.".to_string());
+    }
+
+    match length {
+        2 => {
+            let v = u16::try_from(value)
+                .map_err(|_| "Internal Error: Segment value overflow.".to_string())?;
+            data[index..index + 2].copy_from_slice(&v.to_be_bytes());
+        }
+        4 => {
+            let v = u32::try_from(value)
+                .map_err(|_| "Internal Error: Segment value overflow.".to_string())?;
+            data[index..index + 4].copy_from_slice(&v.to_be_bytes());
+        }
+        8 => {
+            let v = u64::try_from(value)
+                .map_err(|_| "Internal Error: Segment value overflow.".to_string())?;
+            data[index..index + 8].copy_from_slice(&v.to_be_bytes());
+        }
+        _ => return Err("Internal Error: Unsupported metadata field length.".to_string()),
+    }
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::os::unix::fs::PermissionsExt;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    #[test]
+    fn filename_safety_rules() {
+        assert!(has_safe_embedded_filename(Path::new("ok.txt")));
+        assert!(!has_safe_embedded_filename(Path::new(".hidden")));
+        assert!(!has_safe_embedded_filename(Path::new("-dash")));
+        assert!(!has_safe_embedded_filename(Path::new("trail.")));
+        assert!(!has_safe_embedded_filename(Path::new("trail ")));
+        // has_safe_embedded_filename only inspects file_name(); path components
+        // are rejected separately in safe_recovery_path / validate_data_filename.
+        assert!(has_safe_embedded_filename(Path::new("a/b"))); // file_name == "b"
+        assert!(!is_reserved_embedded_filename(b"ok"));
+        assert!(is_reserved_embedded_filename(b"."));
+        assert!(is_reserved_embedded_filename(b".."));
+    }
+
+    #[test]
+    fn filename_character_rejection() {
+        for c in br#"/\:*?"<>|"# {
+            assert!(!is_valid_filename_char(*c), "accepted {}", *c as char);
+        }
+        assert!(!is_valid_filename_char(0x1F)); // C0 control
+        assert!(!is_valid_filename_char(0x7F)); // DEL
+        assert!(is_valid_filename_char(b' '));
+        assert!(is_valid_filename_char(b'a'));
+        assert!(is_valid_filename_char(0x80)); // high bytes are name bytes, not controls
+    }
+
+    #[test]
+    fn staging_output_is_exclusive_and_mode_0600() {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let path =
+            std::env::temp_dir().join(format!("jdvrif_mode_{}_{}", std::process::id(), nanos));
+        let _f = create_new_owner_only(&path).expect("create");
+        let mode = std::fs::metadata(&path).unwrap().permissions().mode() & 0o777;
+        assert_eq!(mode, 0o600);
+        assert!(create_new_owner_only(&path).is_err());
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn get_value_and_update_value_roundtrip() {
+        let mut buf = [0u8; 8];
+        update_value(&mut buf, 0, 0x1234, 2).unwrap();
+        assert_eq!(get_value(&buf, 0, 2).unwrap(), 0x1234);
+        update_value(&mut buf, 2, 0xAABBCCDD, 4).unwrap();
+        assert_eq!(get_value(&buf, 2, 4).unwrap(), 0xAABBCCDD);
+        assert!(get_value(&buf, 7, 2).is_err());
+    }
+}

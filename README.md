@@ -8,11 +8,13 @@ There is also a [***Web edition***](https://cleasbycode.co.uk/jdvrif/app/), whic
 ![Demo Image](https://github.com/CleasbyCode/jdvrif-rs/blob/main/demo_image/jrif_661748.jpg)  
 *Demo Image: **"A place of concealment"** / ***PIN: 5608171548286279209****
 
-Unlike the common steganography method of concealing data within the pixels of a cover image ([***LSB***](https://ctf101.org/forensics/what-is-stegonagraphy/)), ***jdvrif-rs*** hides files within ***application segments*** of a ***JPG*** image. 
+Unlike the common [***LSB steganography method***](https://ctf101.org/forensics/what-is-stegonagraphy/) of concealing data within the pixels of a cover image, ***jdvrif*** mostly hides data within ***application segments*** of a ***JPG*** image (ICC, EXIF, XMP, etc).  
 
-You can conceal any file type up to ***2GB***, although compatible sites (*listed below*) have their own ***much smaller*** size limits and *other requirements.  
+The exception to this is the ***Reddit*** platform conceal mode (-r), where we use the [***QIM steganography method***](https://ieeexplore.ieee.org/document/4804513) (JPEG DCT-domain Quantization Index Modulation), as this is the only storage method that currently works for ***Reddit***.
 
-For increased storage capacity and better security, your embedded data file is compressed with ***flate2/zlib*** — unless it's already a compressed file type over 10 MB — and encrypted with ***XChaCha20-Poly1305*** using the ***libsodium*** cryptographic library (via the Rust ***alkali*** bindings).
+You can conceal any file type up to ***2GB*** for the default conceal mode, although other platform conceal modes and compatible sites (*listed below*) have their own ***much smaller*** size limits and *other requirements.  
+
+For increased storage capacity and better security, your embedded data file is compressed with ***libdeflate/zlib*** — unless it's already a compressed file type over 10 MB — and encrypted with ***XChaCha20-Poly1305*** using the ***libsodium*** cryptographic library.
 
 ***jdvrif-rs*** partly derives from the ***[technique implemented](https://www.vice.com/en/article/bj4wxm/tiny-picture-twitter-complete-works-of-shakespeare-steganography)*** by security researcher ***[David Buchanan](https://www.da.vidbuchanan.co.uk/).*** 
 
@@ -64,45 +66,21 @@ Extracted hidden file: your_secret_file.doc (6165 bytes).
 Complete! Please check your file.
 
 ```
-jdvrif-rs ***mode*** arguments:
- 
- ***conceal*** - Compresses, encrypts and embeds your secret data file within a ***JPG*** cover image.  
- ***recover*** - Decrypts, uncompresses and extracts the concealed data file from a ***JPG*** cover image.
- 
-jdvrif-rs ***conceal*** mode ***platform*** options:
- 
-"***-b***" To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Bluesky*** platform, you must use the ***-b*** option with ***conceal*** mode.
-  ```console
-  $ jdvrif-rs conceal -b my_image.jpg hidden.doc
-  ```
+## Compatible Platforms
 \******************   
 Note: ***Bluesky*** now saves images as ***WEBP*** by default. 
 
-To save an image as ***JPG***, so that you can still recover concealed data with ***jdvrif***,  
-first click the image in the post to open it, then right-click on the image. From the menu, select ***Open image in new tab***.  
+To save an image as ***JPG***, so that you can still recover concealed data with ***jdvrif***.  
+First click the image in the post to open it, then right-click on the image. From the menu, select ***Open image in new tab***.  
 
 Select the new tab and within the address bar, move to the end of the address and add ***@jpg*** then hit enter.  
 Right-click the image and from the menu select ***Save image...***  
 
 Your image should now be downloaded as a ***JPG***, which will now work with ***jdvrif***.
          
-If you want a tool to conceal data using ***WEBP*** images to post on ***Bluesky*** you can use my ***WEBP*** steganography CLI tool ***[wbpdv](https://github.com/CleasbyCode/wbpdv)***
+If you want a tool to conceal data using ***WEBP*** images to post on ***Bluesky*** you can use my ***WEBP*** steganography CLI tool ***[wbpdv](https://github.com/CleasbyCode/wbpdv)***  
 \******************
 
- These images are only compatible for posting on ***Bluesky***. Your embedded data file will be removed if posted on a different platform.
- 
-  You are also required to use the Python script [create_bsky_post.py](https://github.com/CleasbyCode/jdvrif-rs/blob/main/src/bsky/create_bsky_post.py) (found in the repo ***src/bsky*** folder) to post the image to ***Bluesky***.
-  It will not work if you post images to ***Bluesky*** via the browser site or mobile app.  
-
-  To use the script, you will need to create an [***app password***](https://bsky.app/settings/app-passwords) from your ***Bluesky*** account.  
-
-  See the [create_bsky_post.py](https://github.com/CleasbyCode/jdvrif-rs/blob/main/src/bsky/create_bsky_post.py) script in the src/bsky folder for some basic usage examples.
-
-https://github.com/user-attachments/assets/c8c38e6d-ea23-4d67-98d9-cebdcd82b449
-
-https://github.com/user-attachments/assets/b2cc33ff-b2c2-46c2-960b-f7b9ba65223d
-
-## Compatible Platforms
 *Posting size limit measured by the ***combined*** size of the ***cover image*** + ***compressed data file:****  
 
 ● ***Flickr*** (**200MB**), ***ImgPile*** (**100MB**), ***ImgBB*** (**32MB**),  
@@ -116,11 +94,56 @@ For example, with ***Mastodon***, if your cover image is **1MB** you can still e
 
 **Other: The ***Bluesky*** platform has ***separate*** size limits for the ***cover image*** and the ***compressed hidden data file:****  
 
-● ***Bluesky*** (***-b option***). Cover image max size limit (**2,000,000 bytes / ~1.9MB**). Your compressed hidden data file (payload) max size limit (**~171KB**).  The final embedded cover image (cover image + hidden file) must not exceed 2,000,000 bytes (~1.9MB). 
+● ***Bluesky*** (***-b option***). Cover image max size limit (**2,000,000 bytes / ~1.9MB**). Your compressed hidden data file (payload) max size limit (**~171KB**).  
 
-For platforms such as ***X-Twitter*** & ***Tumblr***, which have small size limits, you may want to focus on data that compress well, such as text files, etc.   
+The final embedded cover image (cover image + hidden file) must not exceed 2,000,000 bytes (~1.9MB).  "***create_bsky_post.py***" script is required to post images on ***Bluesky***. *More info on this script further down the page.*
 
-https://github.com/user-attachments/assets/b4c72ea7-40e3-49b0-89aa-ae2dd8ccccb9 
+● ***Reddit*** (***-r option***). While the ***Reddit*** platform has an image upload size limit of **20MB**, the data storage capacity for the cover image is ***much smaller*** and depends on image dimension size.  
+
+For example, a cover image with **1024x1024** dimensions can store only **~6KB** of data, ***2048x2048*** can store **~27KB**, **4096x4096** can store **~109KB** and an image with **6324×6324** max dimensions can store **~254KB**. 
+
+For platforms such as ***X-Twitter***, ***Reddit*** & ***Tumblr***, which have small data size limits, you may want to focus on data that compresses well, such as text files, etc.  
+
+https://github.com/user-attachments/assets/c8c38e6d-ea23-4d67-98d9-cebdcd82b449
+
+https://github.com/user-attachments/assets/88aaa5f7-3272-4d0c-aa59-1a5bfe2f08dc
+  
+jdvrif ***mode*** arguments:
+ 
+  ***conceal*** - Compresses, encrypts and embeds your secret data file within a ***JPG*** cover image.  
+  ***recover*** - Decrypts, uncompresses and extracts the concealed data file from a ***JPG*** cover image.
+ 
+jdvrif ***conceal*** mode ***platform*** options:
+
+ "***-r***" To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Reddit*** platform, you must use the ***-r*** option with ***conceal*** mode.
+  ```console
+  $ jdvrif conceal -r my_image.jpg hidden.doc
+```
+
+  These images are only compatible for posting on ***Reddit***. Your embedded data file will be removed if posted on a different platform.  
+  
+  When saving/downloading an image from ***Reddit*** make sure to click on the image within the post to fully expand it before saving.  
+
+
+https://github.com/user-attachments/assets/9f1b4607-e7f1-4c5f-8929-b42c1a85bb88
+
+
+  "***-b***" To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Bluesky*** platform, you must use the ***-b*** option with ***conceal*** mode.
+  ```console
+  $ jdvrif conceal -b my_image.jpg hidden.doc
+```
+
+  These images are only compatible for posting on ***Bluesky***. Your embedded data file will be removed if posted on a different platform.
+ 
+  You are also required to use the Python script [create_bsky_post.py](https://github.com/CleasbyCode/jdvrif/blob/main/src/bsky/create_bsky_post.py) (found in the repo ***src/bsky*** folder) to post the image to ***Bluesky***.
+  It will not work if you post images to ***Bluesky*** via the browser site or mobile app.  
+
+  To use the script, you will need to create an [***app password***](https://bsky.app/settings/app-passwords) from your ***Bluesky*** account.  
+
+  See the [create_bsky_post.py](https://github.com/CleasbyCode/jdvrif/blob/main/src/bsky/create_bsky_post.py) script in the src/bsky folder for some basic usage examples.
+  
+
+https://github.com/user-attachments/assets/b4c72ea7-40e3-49b0-89aa-ae2dd8ccccb9   
 
 ## Third-Party Software and Assets
 

@@ -203,6 +203,7 @@ name = "jdvrif-rs"
 version = "0.1.0"
 dependencies = [
  "alkali",
+ "cc",
  "flate2",
  "libc",
  "zeroize",

@@ -8,7 +8,7 @@ There is also a [***Web edition***](https://cleasbycode.co.uk/jdvrif/app/), whic
 ![Demo Image](https://github.com/CleasbyCode/jdvrif-rs/blob/main/demo_image/jrif_661748.jpg)  
 *Demo Image: **"A place of concealment"** / ***PIN: 5608171548286279209****
 
-Unlike the common [***LSB steganography method***](https://ctf101.org/forensics/what-is-stegonagraphy/) of concealing data within the pixels of a cover image, ***jdvrif*** mostly hides data within ***application segments*** of a ***JPG*** image (ICC, EXIF, XMP, etc).  
+Unlike the common [***LSB steganography method***](https://ctf101.org/forensics/what-is-stegonagraphy/) of concealing data within the pixels of a cover image, ***jdvrif-rs*** mostly hides data within ***application segments*** of a ***JPG*** image (ICC, EXIF, XMP, etc).  
 
 The exception to this is the ***Reddit*** platform conceal mode (-r), where we use the [***QIM steganography method***](https://ieeexplore.ieee.org/document/4804513) (JPEG DCT-domain Quantization Index Modulation), as this is the only storage method that currently works for ***Reddit***.
 
@@ -70,13 +70,13 @@ Complete! Please check your file.
 \******************   
 Note: ***Bluesky*** now saves images as ***WEBP*** by default. 
 
-To save an image as ***JPG***, so that you can still recover concealed data with ***jdvrif***.  
+To save an image as ***JPG***, so that you can still recover concealed data with ***jdvrif-rs***.  
 First click the image in the post to open it, then right-click on the image. From the menu, select ***Open image in new tab***.  
 
 Select the new tab and within the address bar, move to the end of the address and add ***@jpg*** then hit enter.  
 Right-click the image and from the menu select ***Save image...***  
 
-Your image should now be downloaded as a ***JPG***, which will now work with ***jdvrif***.
+Your image should now be downloaded as a ***JPG***, which will now work with ***jdvrif-rs***.
          
 If you want a tool to conceal data using ***WEBP*** images to post on ***Bluesky*** you can use my ***WEBP*** steganography CLI tool ***[wbpdv](https://github.com/CleasbyCode/wbpdv)***  
 \******************
@@ -108,16 +108,16 @@ https://github.com/user-attachments/assets/c8c38e6d-ea23-4d67-98d9-cebdcd82b449
 
 https://github.com/user-attachments/assets/88aaa5f7-3272-4d0c-aa59-1a5bfe2f08dc
   
-jdvrif ***mode*** arguments:
+jdvrif-rs ***mode*** arguments:
  
   ***conceal*** - Compresses, encrypts and embeds your secret data file within a ***JPG*** cover image.  
   ***recover*** - Decrypts, uncompresses and extracts the concealed data file from a ***JPG*** cover image.
  
-jdvrif ***conceal*** mode ***platform*** options:
+jdvrif-rs ***conceal*** mode ***platform*** options:
 
  "***-r***" To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Reddit*** platform, you must use the ***-r*** option with ***conceal*** mode.
   ```console
-  $ jdvrif conceal -r my_image.jpg hidden.doc
+  $ jdvrif-rs conceal -r my_image.jpg hidden.doc
 ```
 
   These images are only compatible for posting on ***Reddit***. Your embedded data file will be removed if posted on a different platform.  
@@ -130,7 +130,7 @@ https://github.com/user-attachments/assets/9f1b4607-e7f1-4c5f-8929-b42c1a85bb88
 
   "***-b***" To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Bluesky*** platform, you must use the ***-b*** option with ***conceal*** mode.
   ```console
-  $ jdvrif conceal -b my_image.jpg hidden.doc
+  $ jdvrif-rs conceal -b my_image.jpg hidden.doc
 ```
 
   These images are only compatible for posting on ***Bluesky***. Your embedded data file will be removed if posted on a different platform.

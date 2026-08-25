@@ -2,6 +2,10 @@
 name = "jdvrif-rs"
 version = "0.1.0"
 edition = "2021"
+# build.rs lives beside the sources it drives (src/reddit_steg.cpp etc.).
+# Cargo runs it with the package root as its working directory either way,
+# so every relative path inside it is unaffected by living here.
+build = "src/build.rs"
 description = "Linux-only Rust port of jdvrif (JPG data vehicle / steganography)"
 # Linux only: sendfile(2), termios PIN entry, TurboJPEG/libjpeg dynamic links, Unix path APIs.
 # Matches the C++ reference target (Linux). Non-Linux builds are unsupported.

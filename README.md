@@ -113,25 +113,25 @@ jdvrif-rs ***mode*** arguments:
   ***conceal*** - Compresses, encrypts and embeds your secret data file within a ***JPG*** cover image.  
   ***recover*** - Decrypts, uncompresses and extracts the concealed data file from a ***JPG*** cover image.
  
-jdvrif-rs ***conceal*** mode ***platform*** options:
+jdvrif-rs ***conceal*** mode ***platform*** options "***-r***" and "***-b***". 
 
- "***-r***" To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Reddit*** platform, you must use the ***-r*** option with ***conceal*** mode.
+  To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Reddit*** platform, you must use the ***-r*** option with ***conceal*** mode.  
+  
   ```console
   $ jdvrif-rs conceal -r my_image.jpg hidden.doc
-```
+  ```
 
-  These images are only compatible for posting on ***Reddit***. Your embedded data file will be removed if posted on a different platform.  
+  These images are only compatible for posting on ***Reddit***. Your embedded data file will be lost if posted on a different platform.  
   
   When saving/downloading an image from ***Reddit*** make sure to click on the image within the post to fully expand it before saving.  
 
-
 https://github.com/user-attachments/assets/9f1b4607-e7f1-4c5f-8929-b42c1a85bb88
 
-
-  "***-b***" To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Bluesky*** platform, you must use the ***-b*** option with ***conceal*** mode.
+  To create compatible "*file-embedded*" ***JPG*** images for posting on the ***Bluesky*** platform, you must use the ***-b*** option with ***conceal*** mode.  
+  
   ```console
   $ jdvrif-rs conceal -b my_image.jpg hidden.doc
-```
+  ```
 
   These images are only compatible for posting on ***Bluesky***. Your embedded data file will be removed if posted on a different platform.
  
@@ -142,7 +142,6 @@ https://github.com/user-attachments/assets/9f1b4607-e7f1-4c5f-8929-b42c1a85bb88
 
   See the [create_bsky_post.py](https://github.com/CleasbyCode/jdvrif/blob/main/src/bsky/create_bsky_post.py) script in the src/bsky folder for some basic usage examples.
   
-
 https://github.com/user-attachments/assets/b4c72ea7-40e3-49b0-89aa-ae2dd8ccccb9   
 
 ## Third-Party Software and Assets

@@ -32,7 +32,7 @@ $ cargo build --release --locked
 $ sudo cp target/release/jdvrif-rs /usr/bin 
 $ jdvrif-rs 
 
-Usage: jdvrif-rs conceal [-b] <cover_image> <secret_file>
+Usage: jdvrif-rs conceal [-b|-r] <cover_image> <secret_file>
        jdvrif-rs recover <cover_image>  
        jdvrif-rs --info
 

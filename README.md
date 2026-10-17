@@ -6,7 +6,7 @@
 
 Your data file is compressed with ***flate2/zlib***, then encrypted with ***XChaCha20-Poly1305*** (***libsodium*** secretstream, via the Rust [***alkali***](https://github.com/tom25519/alkali) bindings) under a key derived by ***Argon2id*** from a randomly generated ***recovery PIN***, and finally embedded in the cover image. The PIN is displayed once, at the end of ***conceal***, and is never stored anywhere: without it the concealed file cannot be recovered.
 
-Using the ***default conceal mode***, you can conceal any file type up to ***2GiB***. The other platform conceal modes and the compatible social media sites (*listed below*) have their own ***much smaller*** size limits and other requirements.
+Using the ***default conceal mode***, you can conceal any file type, with the finished image capped at ***2GiB***. The other platform conceal modes and the compatible social media sites (*listed below*) have their own ***much smaller*** size limits and other requirements.
 
 ***jdvrif-rs*** is ***format-compatible*** with the C++ ***jdvrif***: images concealed by either build can be recovered by the other, in every mode. Output images are not byte-identical between the two, by design — the recovery PIN, the Argon2id salt and the secretstream header are random.
 
@@ -40,9 +40,13 @@ Quality of cover image is not important for this method and should be kept basic
 
 While the ***X-Twitter*** platform can use the default method provided by ***jdvrif-rs***, where data is concealed within APP2/ICC segments, ***X-Twitter*** limits this to a single ICC segment with a maximum size of just **~10KiB**.
 
-To carry more than that **~10KiB**, use the ***X-Twitter*** platform conceal mode (***-x***). It abandons metadata segments entirely — nothing is written to an ICC profile — and instead uses the [***adaptive J-UNIWARD steganography method with Syndrome-Trellis Coding (STC)***](https://www.google.com/search?q=adaptive+J-UNIWARD+steganography+method+with+Syndrome-Trellis+Coding+(STC)&oq=adaptive+J-UNIWARD+steganography+method+with+Syndrome-Trellis+Coding+(STC)&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQIRiPAtIBCDI1NDNqMGo3qAIAsAIA&sourceid=chrome&source=chrome.ob&ie=UTF-8). The cover is transcoded to progressive 4:2:0 at its source-derived quality (capped at **Q97**).
+To carry more than that **~10KiB**, use the ***X-Twitter*** platform conceal mode (***-x***). It abandons metadata segments entirely — nothing is written to an ICC profile — and instead uses the [***adaptive J-UNIWARD steganography method with Syndrome-Trellis Coding (STC)***](https://www.google.com/search?q=adaptive+J-UNIWARD+steganography+method+with+Syndrome-Trellis+Coding+(STC)). The cover is transcoded to progressive 4:2:0 at its source-derived quality (capped at **Q97**).
 
 To maximise storage capacity for the ***X-Twitter*** platform, use a high quality/detailed cover image with large dimension sizes, **1024x1024**, **2048x2048**, **4096x4096 (max)**, etc.
+
+The ***-r*** and ***-x*** carriers encrypt your data and key its location to your recovery PIN using ***Argon2id***, but embedding still alters the image's DCT statistics, so dedicated steganalysis may reveal that an image carries hidden data.
+
+***-r*** and ***-x*** images created with ***jdvrif v9.0*** remain recoverable, but ***v9.0*** cannot recover ***-r*** or ***-x*** images created with ***v9.1*** or the current ***jdvrif-rs***.
 
 Both DCT modes carry far less data than the default mode, so use ***capsize*** to measure a cover image before choosing a payload (see [Checking capacity](#checking-capacity-with-capsize)).
 
@@ -126,7 +130,7 @@ Requirements for the cover image:
 
 Requirements for the secret data file:
 
-● The embedded filename must be no longer than **20 characters** and must not begin with `.` or `-`. The name is stored in the image and restored on ***recover***.
+● The embedded filename must be no longer than **20 bytes**, must not begin with `.` or `-` or end with a space or `.`, and must be valid UTF-8 without control or bidirectional-formatting characters or any of `/ \ : * ? " < > |`. The name is stored in the image and restored on ***recover***.
 
 ● Your data file is compressed before encryption, except for recognised already-compressed file types (`.zip`, `.7z`, `.mp4`, `.jpg`, `.png`, etc). In the default and ***-b*** modes those types skip compression only when larger than **10MiB**; in ***-r*** and ***-x*** modes they always skip it. For anything else destined for a small platform limit, consider compressing it yourself first (*zip, rar, 7z, etc.*) so that you know its exact stored size.
 
@@ -269,7 +273,9 @@ $ cargo test
 $ bash src/scripts/run_rust_tests.sh
 ```
 
-`run_rust_tests.sh` builds the release binary, runs `cargo test`, then runs the platform regression suites (*golden recovery, round-trip, Reddit, X-Twitter*) against it. `src/scripts/interop_matrix.sh` conceals with one binary and recovers with the other, both ways, across all four modes, and `src/scripts/parity_smoke.sh` / `parity_full.sh` compare the shared `--info` documentation. Those three need the C++ ***jdvrif*** source tree available alongside this one, with its binary built by `src/compile_jdvrif.sh`.
+`run_rust_tests.sh` builds the release binary, runs `cargo test`, the JPEG safety tests, the platform regression suites (*golden recovery, round-trip, Reddit, X-Twitter*) and a recovery-snapshot test against it. `src/scripts/interop_matrix.sh` conceals with one binary and recovers with the other, both ways, across all four modes, and `src/scripts/parity_smoke.sh` / `parity_full.sh` compare the shared `--info` documentation.
+
+All four scripts need the C++ ***jdvrif*** source tree. They expect a parent directory holding the C++ `src/` folder (*with its `tests/` and a `jdvrif` binary built by `src/compile_jdvrif.sh`*) and this repository checked out beside it as `rust_port/`. Set `JDVRIF_CPP_TESTS_DIR` to point `run_rust_tests.sh` at the C++ `tests/` folder elsewhere, and `JDVRIF_CPP_BIN` / `JDVRIF_RUST_BIN` to choose the binaries.
 
 ## Third-Party Software and Assets
 
@@ -329,7 +335,7 @@ $ bash src/scripts/run_rust_tests.sh
 
    ### Optional Bluesky posting helper
 
-  - Bryan Newbold / ATProto Hacker Cookbook — create_bsky_post.py — Basis for the [forked](https://gist.github.com/CleasbyCode/1eb678ca1fa1975b1c1e20aeec33637e) Bluesky posting helper (src/bsky/bsky_post.py). 
+  - Bryan Newbold / ATProto Hacker Cookbook — create_bsky_post.py — Basis for the [forked](https://gist.github.com/CleasbyCode/1eb678ca1fa1975b1c1e20aeec33637e) Bluesky posting helper (src/bsky/create_bsky_post.py). 
     For reference see the [Cookbook copy](https://github.com/bluesky-social/cookbook/blob/main/python-bsky-post/create_bsky_post.py)
 
     License: [CC0 1.0 Universal](https://github.com/bluesky-social/cookbook/blob/main/LICENSE-CC0).

@@ -15,3 +15,8 @@ Start-Service sshd
 Set-Service sshd -StartupType Automatic
 
 The OpenSSH installer normally opens port 22 in the firewall. If I can't connect, run New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server' -Protocol TCP -LocalPort 22 -Action Allow in the same elevated PowerShell.
+
+
+$f = "$env:ProgramData\ssh\administrators_authorized_keys"
+Add-Content -Encoding ascii $f 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE1UwK+SgNfAwcL6DqKF2Nxy+faALrwqAZj6M7SwOcan claude-pdvzip-winvm'
+icacls $f /inheritance:r /grant "Administrators:F" /grant "SYSTEM:F"

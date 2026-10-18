@@ -1,0 +1,17 @@
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.ssh" | Out-Null
+Add-Content -Encoding ascii "$env:USERPROFILE\.ssh\authorized_keys" 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE1UwK+SgNfAwcL6DqKF2Nxy+faALrwqAZj6M7SwOcan claude-pdvzip-winvm'
+
+Option B: administrator account
+
+For admins, OpenSSH ignores the per-user file. The key has to go in a shared file that only Administrators and SYSTEM can access. Run this in an elevated PowerShell:
+
+$f = "$env:ProgramData\ssh\administrators_authorized_keys"
+Add-Content -Encoding ascii $f 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE1UwK+SgNfAwcL6DqKF2Nxy+faALrwqAZj6M7SwOcan claude-pdvzip-winvm'
+icacls $f /inheritance:r /grant "Administrators:F" /grant "SYSTEM:F"
+
+Then, for either option, start the SSH server and make sure it comes back after reboots (elevated PowerShell):
+
+Start-Service sshd
+Set-Service sshd -StartupType Automatic
+
+The OpenSSH installer normally opens port 22 in the firewall. If I can't connect, run New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server' -Protocol TCP -LocalPort 22 -Action Allow in the same elevated PowerShell.

@@ -1,0 +1,29 @@
+AI response regarding spec:
+ 
+ This is a solid, entry-level 1080p gaming PC that handles most modern games well at medium-to-high settings, though the processor choice leaves a small amount of performance on the table compared to a standard Ryzen 5 5600.
+
+Component Breakdown
+
+• CPU (AMD Ryzen 5 5600G): A capable 6-core, 12-thread processor, though it features integrated graphics you won't need with a dedicated card. It is also limited to PCIe Gen 3.0 instead of Gen 4.0.
+• GPU (Radeon RX 6600 8GB): A great budget 1080p graphics card that delivers high frame rates in esports and modern titles.
+• Motherboard (MSI B550-A PRO): A reliable ATX board with solid VRMs and good upgrade headroom for the AM4 platform.
+• RAM (16GB Corsair Vengeance 3600MHz): Ideal speed for Ryzen 5000 series processors, ensuring smooth performance.
+• Power Supply (MSI MAG A650BN 650W): 650W is plenty of power for this setup with plenty of headroom for future upgrades.
+• Storage (512GB NVMe SSD + 480GB SSD): Decent starting capacity for a small OS drive and a secondary game library, though modern game sizes will fill them up quickly.
+• Case & Connectivity (1STPLAYER LED case, WiFi 6E/Bluetooth 5.3): Provides standard airflow/aesthetics alongside modern high-speed wireless and Bluetooth connectivity.
+
+The Catch (Bottleneck / Optimization)
+
+• The APU + Dedicated GPU Mismatch: Because you are using a dedicated RX 6600, a standard Ryzen 5 5600 or Ryzen 5 5600X would be a better choice. They offer larger L3 cache and PCIe Gen 4.0 support, which lets the RX 6600 run at its full potential rather than being slightly throttled by Gen 3.0 speeds.
+
+For this specific second-hand machine, a fair price is between £350 and £400.
+You should absolutely avoid paying anything over £450, as you can build a faster, brand-new equivalent machine with full warranties for around £500 to £550.
+
+The Used Market Value Breakdown
+
+To understand why it sits at this valuation, it helps to break down what the individual components are actually worth on the second-hand market today:
+• GPU (RX 6600 8GB): ~£130 – Great budget card, holds its used value well due to 1080p demand.
+• CPU (Ryzen 5 5600G): ~£65 – Lower than a standard 5600 because it lacks PCIe Gen 4.0 support and has a smaller L3 cache.
+• Motherboard (B550-A Pro): ~£50 – A solid entry-to-mid board, but it is tied to the older AM4 generation.
+• RAM & Storage: ~£45 – 16GB of DDR4 and a combined ~1TB of older/mixed SSD space are incredibly cheap to buy now.
+• Case, PSU, & WiFi Card: ~£60 – While the WiFi 6E card is a nice bonus, second-hand cases and budget power supplies carry very little resale value.

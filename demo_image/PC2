@@ -1,0 +1,28 @@
+It will work, but will make gaming slower, so probably better off getting matching RAM?
+
+"Should it work if I mix the memory by adding two Kingston HyperX 2666 modules?"
+
+Google AI:
+
+Yes, it will work, but it will slow down your computer's performance.
+While the system will boot and recognize the total capacity (32GB), mixing RAM kits forces your computer to make compromises to maintain stability.
+
+The Cost of Mixing RAM
+
+• Speed Drops to the Lowest Common Denominator: Your system cannot run different sticks at different speeds. Adding the 2666MHz Kingston modules will force your fast 3600MHz Corsair RAM to downclock and run at 2666MHz.
+
+• Ryzen Performance Hit: AMD Ryzen 5000 processors are highly sensitive to RAM speeds. Dropping your memory speed from 3600MHz to 2666MHz will cause a noticeable drop in gaming frame rates (FPS) and general system responsiveness, as the CPU's internal clock (Infinity Fabric) slows down to match the RAM.
+
+• Potential Instability: Even if you accept the lower speed, mixing different brands, memory chips, and timings can occasionally cause random blue screens (BSODs) or boot failures.
+
+🛠️ How to Do It Correctly (If You Proceed)
+
+If you absolutely need the extra capacity for heavy multitasking or production work and don't mind the gaming performance loss, install them like this:
+
+1. Alternate the Slots: Put the Corsair sticks in slots 2 and 4, and the Kingston sticks in slots 1 and 3 (counting away from the CPU).
+
+2. Clear BIOS settings: Before installing the new sticks, turn off your PC and clear any existing XMP profiles in your BIOS so the system boots at standard default speeds first.
+
+Recommendation
+
+If this is primarily a gaming PC, stick with the 16GB of Corsair 3600MHz RAM...

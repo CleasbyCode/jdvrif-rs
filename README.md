@@ -4,7 +4,7 @@
 
 ***jdvrif-rs*** (*JPG Data Vehicle*) is a fast, easy-to-use steganography command-line tool for concealing and extracting any file type via a **JPG** image. ***Linux only***.
 
-Your data file is compressed with ***flate2/zlib***, then encrypted with ***XChaCha20-Poly1305*** (***libsodium*** secretstream, via the Rust [***alkali***](https://github.com/tom25519/alkali) bindings) under a key derived by ***Argon2id*** from a randomly generated ***recovery PIN***, and finally embedded in the cover image. The PIN is 128 random bits, printed as 24 Base58 characters in six groups of four (e.g. `Jgoe-TsV4-hWLD-SMP9-PJt7-nPTd`; the last two characters are a typo check). It is displayed once, at the end of ***conceal***, and is never stored anywhere: without it the concealed file cannot be recovered.
+Your data file is compressed with ***flate2/zlib***, then encrypted with ***XChaCha20-Poly1305*** (***libsodium*** secretstream, via the Rust [***alkali***](https://github.com/tom25519/alkali) bindings) under a key derived by ***Argon2id*** from a randomly generated ***recovery KEY***, and finally embedded in the cover image. The KEY is ***128-bit***, printed as 24 Base58 characters in six groups of four (e.g. `Jgoe-TsV4-hWLD-SMP9-PJt7-nPTd`; the last two characters are a typo check). It is displayed once, at the end of ***conceal***, and is never stored anywhere: without it the concealed file cannot be recovered.
 
 Using the ***default conceal mode***, you can conceal any file type, with the finished image capped at ***2GiB***. The other platform conceal modes and the compatible social media sites (*listed below*) have their own ***much smaller*** size limits and other requirements.
 
@@ -15,7 +15,7 @@ There is also a [***Web edition***](https://cleasbycode.co.uk/jdvrif/app/), whic
 ***jdvrif-rs*** partly derives from the ***[technique implemented](https://www.vice.com/en/article/bj4wxm/tiny-picture-twitter-complete-works-of-shakespeare-steganography)*** by security researcher ***[David Buchanan](https://www.da.vidbuchanan.co.uk/).***
 
 ![Demo Image](https://github.com/CleasbyCode/jdvrif-rs/blob/main/demo_image/jrif_eb6dae37a.jpg)  
-*Demo Image: **"A place of concealment"** / ***PIN: 12352318802334117817*** (made with jdvrif v9.x, so it uses the older numeric PIN, which still works)*
+***Demo Image -*** ***KEY: 12352318802334117817***
 
 ## How jdvrif-rs conceals data
 

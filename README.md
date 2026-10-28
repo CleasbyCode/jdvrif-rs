@@ -14,8 +14,8 @@ There is also a [***Web edition***](https://cleasbycode.co.uk/jdvrif/app/), whic
 
 ***jdvrif-rs*** partly derives from the ***[technique implemented](https://www.vice.com/en/article/bj4wxm/tiny-picture-twitter-complete-works-of-shakespeare-steganography)*** by security researcher ***[David Buchanan](https://www.da.vidbuchanan.co.uk/).***
 
-![Demo Image](https://github.com/CleasbyCode/jdvrif-rs/blob/main/demo_image/jrif_00d012b0f.jpg)  
-***Demo Image -*** ***KEY: 9h8C-YBQM-hMuD-rcbL-SvBb-ERTS***
+![Demo Image](https://github.com/CleasbyCode/jdvrif-rs/blob/main/demo_image/jrif_28f210990.jpg)  
+***Demo Image -*** ***KEY: Re93-rFt3-m5pJ-coJx-7ewF-FNQS***
 
 ## How jdvrif-rs conceals data
 

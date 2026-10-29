@@ -2,7 +2,10 @@
 
 ***This is an experimental Rust port of my C++ steganography tool [***jdvrif***](https://github.com/CleasbyCode/jdvrif)***
 
-***jdvrif-rs*** (*JPG Data Vehicle*) is a fast, easy-to-use steganography command-line tool for concealing and extracting any file type via a **JPG** image. ***Linux only***.
+***jdvrif-rs*** is a steganography command-line tool for concealing and extracting any file type via a **JPG** image.
+
+![Demo Image](https://github.com/CleasbyCode/jdvrif-rs/blob/main/demo_image/jrif_28f210990.jpg)  
+***Demo Image -*** ***KEY: Re93-rFt3-m5pJ-coJx-7ewF-FNQS***
 
 Your data file is compressed with ***flate2/zlib***, then encrypted with ***XChaCha20-Poly1305*** (***libsodium*** secretstream, via the Rust [***alkali***](https://github.com/tom25519/alkali) bindings) under a key derived by ***Argon2id*** from a randomly generated ***recovery KEY***, and finally embedded in the cover image. The KEY is ***128-bit***, printed as 24 Base58 characters (*letters and digits*) in six groups of four (e.g. `Jgoe-TsV4-hWLD-SMP9-PJt7-nPTd`; the last two characters are a typo check). It is displayed once, at the end of ***conceal***, and is never stored anywhere: without it the concealed file cannot be recovered.
 
@@ -13,9 +16,6 @@ Using the ***default conceal mode***, you can conceal any file type, with the fi
 There is also a [***Web edition***](https://cleasbycode.co.uk/jdvrif/app/), which you can use immediately, as a convenient alternative to downloading and compiling the CLI source code. Web file uploads are limited to **20MiB**.
 
 ***jdvrif-rs*** partly derives from the ***[technique implemented](https://www.vice.com/en/article/bj4wxm/tiny-picture-twitter-complete-works-of-shakespeare-steganography)*** by security researcher ***[David Buchanan](https://www.da.vidbuchanan.co.uk/).***
-
-![Demo Image](https://github.com/CleasbyCode/jdvrif-rs/blob/main/demo_image/jrif_28f210990.jpg)  
-***Demo Image -*** ***KEY: Re93-rFt3-m5pJ-coJx-7ewF-FNQS***
 
 ## How jdvrif-rs conceals data
 

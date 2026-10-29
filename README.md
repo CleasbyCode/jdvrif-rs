@@ -4,7 +4,7 @@
 
 ***jdvrif-rs*** (*JPG Data Vehicle*) is a fast, easy-to-use steganography command-line tool for concealing and extracting any file type via a **JPG** image. ***Linux only***.
 
-Your data file is compressed with ***flate2/zlib***, then encrypted with ***XChaCha20-Poly1305*** (***libsodium*** secretstream, via the Rust [***alkali***](https://github.com/tom25519/alkali) bindings) under a key derived by ***Argon2id*** from a randomly generated ***recovery KEY***, and finally embedded in the cover image. The KEY is ***128-bit***, printed as 24 Base58 characters in six groups of four (e.g. `Jgoe-TsV4-hWLD-SMP9-PJt7-nPTd`; the last two characters are a typo check). It is displayed once, at the end of ***conceal***, and is never stored anywhere: without it the concealed file cannot be recovered.
+Your data file is compressed with ***flate2/zlib***, then encrypted with ***XChaCha20-Poly1305*** (***libsodium*** secretstream, via the Rust [***alkali***](https://github.com/tom25519/alkali) bindings) under a key derived by ***Argon2id*** from a randomly generated ***recovery KEY***, and finally embedded in the cover image. The KEY is ***128-bit***, printed as 24 Base58 characters (*letters and digits*) in six groups of four (e.g. `Jgoe-TsV4-hWLD-SMP9-PJt7-nPTd`; the last two characters are a typo check). It is displayed once, at the end of ***conceal***, and is never stored anywhere: without it the concealed file cannot be recovered.
 
 Using the ***default conceal mode***, you can conceal any file type, with the finished image capped at ***2GiB***. The other platform conceal modes and the compatible social media sites (*listed below*) have their own ***much smaller*** size limits and other requirements.
 

@@ -21,10 +21,10 @@ There is also a [***Web edition***](https://cleasbycode.co.uk/jdvrif/app/), whic
 
 Unlike the common [***LSB***](https://ctf101.org/forensics/what-is-stegonagraphy/) (*Least Significant Bit*) steganography method of concealing data within the pixels of a cover image, ***jdvrif-rs*** mostly hides data within ***application segments*** of a ***JPG*** image (ICC, EXIF, XMP, etc).
 
-| Conceal mode | Where the data goes | Share the output image on |
-| --- | --- | --- |
-| *(no option)* | APP2/ICC profile segments | X-Twitter, Tumblr, Mastodon, Pixelfed, PostImage, ImgBB, ImgPile, Flickr |
-| ***-b*** | framed EXIF / Photoshop / XMP segments | ***Bluesky*** only |
+| Conceal&nbsp;Mode | Storage Method | Compatible Platforms |
+| :---: | :---: | :---: |
+| *(no option)* | APP2/ICC profile segments | X-Twitter, Tumblr, Mastodon,<br>Pixelfed, PostImage, ImgBB,<br>ImgPile, Flickr |
+| ***-b*** | Framed EXIF / Photoshop / XMP segments | ***Bluesky*** only |
 | ***-r*** | JPEG DCT coefficients (***QIM***) | ***Reddit*** only |
 | ***-x*** | JPEG DCT coefficients (***J-UNIWARD/STC***) | ***X-Twitter*** only |
 

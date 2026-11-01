@@ -11,7 +11,7 @@ Your data file is compressed with ***flate2/zlib***, then encrypted with ***XCha
 
 Using the ***default conceal mode***, you can conceal any file type, with the finished image capped at ***2GiB***. The other platform conceal modes and the compatible social media sites (*listed below*) have their own ***much smaller*** size limits and other requirements.
 
-***jdvrif-rs*** is ***format-compatible*** with the C++ ***jdvrif***: images concealed by either build can be recovered by the other, in every mode. Output images are not byte-identical between the two, by design — the recovery PIN, the Argon2id salt and the secretstream header are random.
+***jdvrif-rs*** is ***format-compatible*** with the C++ ***jdvrif***: images concealed by either build can be recovered by the other, in every mode. Output images are not byte-identical between the two, by design — the recovery KEY, the Argon2id salt and the secretstream header are random.
 
 There is also a [***Web edition***](https://cleasbycode.co.uk/jdvrif/app/), which you can use immediately, as a convenient alternative to downloading and compiling the CLI source code. Web file uploads are limited to **20MiB**.
 
@@ -44,15 +44,15 @@ To carry more than that **~10KiB**, use the ***X-Twitter*** platform conceal mod
 
 To maximise storage capacity for the ***X-Twitter*** platform, use a high quality/detailed cover image with large dimension sizes, **1024x1024**, **2048x2048**, **4096x4096 (max)**, etc.
 
-The ***-r*** and ***-x*** carriers encrypt your data and key its location to your recovery PIN using ***Argon2id***, but embedding still alters the image's DCT statistics, so dedicated steganalysis may reveal that an image carries hidden data.
+The ***-r*** and ***-x*** carriers encrypt your data and key its location to your recovery KEY using ***Argon2id***, but embedding still alters the image's DCT statistics, so dedicated steganalysis may reveal that an image carries hidden data.
 
-Images created with ***jdvrif v9.x*** (numeric PINs of up to 20 digits, including ***-r*** and ***-x*** images) remain recoverable with their numeric PINs, but ***v9.x*** cannot recover images created with ***v10*** or the current ***jdvrif-rs***.
+This release reads only images made by ***jdvrif v10*** or later. Images made with ***jdvrif v9.x*** or earlier (*numeric PINs*) need the legacy ***jdvrif*** release to recover.
 
 Both DCT modes carry far less data than the default mode, so use ***capsize*** to measure a cover image before choosing a payload (see [Checking capacity](#checking-capacity-with-capsize)).
 
 ## Requirements & Compilation (Linux)
 
-***Linux only*** (*x86_64 / aarch64*): the port uses `sendfile(2)`, `termios` PIN entry, `O_TMPFILE` staging via `/proc/self/fd`, and Unix path APIs. Non-Linux targets fail the build deliberately.
+***Linux only*** (*x86_64 / aarch64*): the port uses `sendfile(2)`, `termios` KEY entry, `O_TMPFILE` staging via `/proc/self/fd`, and Unix path APIs. Non-Linux targets fail the build deliberately.
 
 You need a **Rust toolchain** (*install via [rustup](https://rustup.rs)*) and a **C++ compiler** — the ***-r*** and ***-x*** DCT carriers are the C++ implementations from ***jdvrif***, compiled by `build.rs` behind narrow C ABIs so that the on-image formats stay exactly interoperable. The native libraries required are **libsodium** (*located through alkali with `pkg-config`*) and **libjpeg-turbo** (*both the `turbojpeg` and `libjpeg` APIs*). No system zlib is needed: compression is provided by ***flate2***'s pure-Rust ***miniz_oxide*** backend. **OpenMP** is enabled automatically for the ***-x*** J-UNIWARD cost pass when building the carriers with GCC; Clang uses the sequential fallback.
 
@@ -116,7 +116,7 @@ Complete! Please check your file.
 jdvrif-rs ***mode*** arguments:
 
   ***conceal*** - Compresses, encrypts and embeds your secret data file within a ***JPG*** cover image.  
-  ***recover*** - Decrypts, uncompresses and extracts the concealed data file from a ***JPG*** cover image (*recovery KEY/PIN required*).  
+  ***recover*** - Decrypts, uncompresses and extracts the concealed data file from a ***JPG*** cover image (*recovery KEY required*).  
   ***capsize*** - Reports the carrier capacity of a cover image for ***-r*** or ***-x*** mode. No image is saved.
 
 Requirements for the cover image:
@@ -250,15 +250,15 @@ https://github.com/user-attachments/assets/1daef508-d304-491f-bfe2-2cdbb5d62081
 
 These are interop-neutral: both builds read each other's images in every mode.
 
-● **Crypto.** The [***alkali***](https://github.com/tom25519/alkali) crate (*maintained libsodium bindings*) provides the same Argon2id (*INTERACTIVE cost*) PIN→key derivation and `crypto_secretstream` XChaCha20-Poly1305 primitives that the C++ build calls directly. New images are written in the `KDF5` format (*`KDF4`'s layout, keyed by the 128-bit recovery PIN's raw bytes*), which records the Argon2id cost parameters in the image (*range-checked before the PIN is requested, since they drive an allocation and a work loop*). Recovery also accepts the older `KDF4`, `KDF3` and `KDF2` formats with their numeric PINs.
+● **Crypto.** The [***alkali***](https://github.com/tom25519/alkali) crate (*maintained libsodium bindings*) provides the same Argon2id (*INTERACTIVE cost*) KEY→encryption-key derivation and `crypto_secretstream` XChaCha20-Poly1305 primitives that the C++ build calls directly. Images are written and read in the `KDF5` format (*keyed by the 128-bit recovery KEY's raw bytes*), which records the Argon2id cost parameters in the image (*range-checked before the KEY is requested, since they drive an allocation and a work loop*).
 
 ● **Compression.** This port uses ***flate2***/***miniz_oxide*** and always streams in 2MiB chunks, checking for cancellation each chunk. The C++ build additionally has a whole-buffer ***libdeflate*** fast path, capped at 128MiB so its peak memory and its one uninterruptible window stay bounded. Both pick the same levels (*fastest above 500MB, otherwise level 6 — level 9 measured 3.1x slower for 0.45% smaller output*) and both emit standard RFC 1950 zlib streams, so either build can recover the other's output. Compressed sizes can differ slightly.
 
-● **Carrier code.** The ***-r*** and ***-x*** carriers are the C++ sources from ***jdvrif***, kept in `src/` beside the Rust code and compiled by `build.rs` behind a narrow C ABI. Rust keeps ownership of CLI validation, compression, key derivation, encryption, envelope construction, PIN handling, decryption, output naming and staging; the bridges are limited to libjpeg pixel/DCT and adaptive-carrier operations.
+● **Carrier code.** The ***-r*** and ***-x*** carriers are the C++ sources from ***jdvrif***, kept in `src/` beside the Rust code and compiled by `build.rs` behind a narrow C ABI. Rust keeps ownership of CLI validation, compression, key derivation, encryption, envelope construction, KEY handling, decryption, output naming and staging; the bridges are limited to libjpeg pixel/DCT and adaptive-carrier operations.
 
 ● **Staging.** Intermediate files (*the deflated payload, the encrypted payload, the extracted ciphertext and the decrypted output*) live on inodes created with `O_TMPFILE` and are addressed through `/proc/self/fd`, so plaintext never appears as a directory entry and cannot survive a `SIGKILL`. The recovered file is given its only name by `linkat(2)` at commit time. Where the filesystem lacks `O_TMPFILE`, the created-then-unlinked inode cannot be re-linked, so its contents are copied to the `O_EXCL` `0600` destination instead.
 
-● **Output images** are not byte-identical between the two builds, because the recovery PIN, the Argon2id salt and the secretstream header are random.
+● **Output images** are not byte-identical between the two builds, because the recovery KEY, the Argon2id salt and the secretstream header are random.
 
 ## Recovery KEY format
 
@@ -276,7 +276,7 @@ This section is for anyone writing a compatible implementation. Everything below
    ```
 3. ***Display*** — the 24 characters in six groups of four, joined with `-`.
 
-When a KEY is entered, spaces, tabs and `-` are ignored and letters are case-sensitive. A numeric entry of 1–20 digits (*no leading zero, at most 18446744073709551615*) is an old (*pre-v10*) PIN.
+When a KEY is entered, spaces, tabs and `-` are ignored and letters are case-sensitive.
 
 | Key bytes (hex) | KEY |
 | --- | --- |
@@ -310,7 +310,7 @@ The first `count` items are the positions used, in order (*-x: the header's posi
 $ cargo test
 ```
 
-`cargo test` covers the recovery PIN codec (*Base58 test vectors, check pair, malformed input*), the `KDF5`/PIN-kind checks, `KDF4` conceal/recovery (*including out-of-range recorded costs being refused*), `KDF3` authenticated-mode recovery, `KDF2` backward recovery, mode-metadata tampering, wrong-PIN handling, unsupported legacy metadata, streaming output, and the no-replace output primitives.
+`cargo test` covers the recovery KEY codec (*Base58 test vectors, check pair, malformed input, rejection of old numeric PINs*), `KDF5` recovery (*including out-of-range recorded costs being refused*), mode-metadata tampering, wrong-KEY handling, rejection of pre-v10 metadata, streaming output, and the no-replace output primitives.
 
 ```console
 $ bash src/scripts/run_rust_tests.sh

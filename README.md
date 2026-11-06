@@ -84,6 +84,20 @@ Run `jdvrif-rs --info` for the full built-in guide to modes, platform options an
 ```console
 $ jdvrif-rs conceal your_cover_image.jpg your_secret_file.doc
 
+Cover image: your_cover_image.jpg (36KiB).
+Data file:   your_secret_file.doc (6KiB).
+
+Preparing cover image...
+ ✓ 1280x960, Progressive YCbCr 4:2:0, Source-derived Q65 quantization, metadata removed.
+Compressing data file...
+ ✓ 6KiB -> 998 bytes (83% smaller).
+Encrypting...
+ ✓ XChaCha20-Poly1305, 256-bit key derived by Argon2id from the 128-bit recovery KEY.
+Embedding...
+ ✓ 1 ICC_PROFILE (APP2) segment.
+Writing output image...
+ ✓ 36.4KiB.
+
 Platform compatibility for output image:-
 
  ✓ X-Twitter
@@ -99,15 +113,27 @@ Recovery KEY: [***Jgoe-TsV4-hWLD-SMP9-PJt7-nPTd***]
 
 Important: Keep your KEY safe, so that you can extract the hidden file.
 
-Saved "file-embedded" JPG image: jrif_3e1988793.jpg (143029 bytes).
+Saved "file-embedded" JPG image: jrif_3e1988793.jpg (37703 bytes).
 
 Complete!
 
 $ jdvrif-rs recover jrif_3e1988793.jpg
 
+Image file: jrif_3e1988793.jpg (36.8KiB).
+
+Locating hidden data...
+ ✓ Default mode, 1 ICC_PROFILE (APP2) segment.
+
 KEY: ****-****-****-****-****-****
 
-Extracted hidden file: your_secret_file.doc (6165 bytes).
+Deriving key...
+ ✓ Argon2id from the 128-bit recovery KEY.
+Decrypting...
+ ✓ XChaCha20-Poly1305, authenticated.
+Decompressing...
+ ✓ 998 bytes -> 6KiB.
+Writing output file...
+ ✓ your_secret_file.doc (6KiB).
 
 Complete! Please check your file.
 
@@ -131,7 +157,7 @@ Requirements for the secret data file:
 
 ● The embedded filename must be no longer than **20 bytes**, must not begin with `.` or `-` or end with a space or `.`, and must be valid UTF-8 without control or bidirectional-formatting characters or any of `/ \ : * ? " < > |`. The name is stored in the image and restored on ***recover***.
 
-● Your data file is compressed before encryption, and the compressed form is kept only when it is smaller than the original; otherwise the file is stored as-is. In the default and ***-b*** modes, recognised already-compressed file types (`.zip`, `.7z`, `.mp4`, `.jpg`, `.png`, etc) larger than **10MiB** skip the compression attempt. ***-b*** mode always stores the compressed form. For anything destined for a small platform limit, consider compressing it yourself first (*zip, rar, 7z, etc.*) so that you know its exact stored size.
+● Your data file is compressed before encryption, and the compressed form is kept only when it is smaller than the original; otherwise the file is stored as-is. In the default and ***-b*** modes, a data file larger than **10MiB** skips the compression attempt when its header shows an already-compressed format (*ZIP, 7-Zip, RAR, gzip, MP4, MKV, MP3, JPG, PNG, etc*). The file's contents decide, not its extension, so a renamed archive is still recognised. ***-b*** mode always stores the compressed form. For anything destined for a small platform limit, consider compressing it yourself first (*zip, rar, 7z, etc.*) so that you know its exact stored size.
 
 ## Compatible Platforms
 
@@ -256,7 +282,7 @@ These are interop-neutral: both builds read each other's images in every mode.
 
 ● **Carrier code.** The ***-r*** and ***-x*** carriers are the C++ sources from ***jdvrif***, kept in `src/` beside the Rust code and compiled by `build.rs` behind a narrow C ABI. Rust keeps ownership of CLI validation, compression, key derivation, encryption, envelope construction, KEY handling, decryption, output naming and staging; the bridges are limited to libjpeg pixel/DCT and adaptive-carrier operations.
 
-● **Staging.** Intermediate files (*the deflated payload, the encrypted payload, the extracted ciphertext and the decrypted output*) live on inodes created with `O_TMPFILE` and are addressed through `/proc/self/fd`, so plaintext never appears as a directory entry and cannot survive a `SIGKILL`. The recovered file is given its only name by `linkat(2)` at commit time. Where the filesystem lacks `O_TMPFILE`, the created-then-unlinked inode cannot be re-linked, so its contents are copied to the `O_EXCL` `0600` destination instead.
+● **Staging.** Intermediate files (*the deflated payload, the encrypted payload, the extracted ciphertext and the decrypted output*) live on inodes created with `O_TMPFILE` and are addressed through `/proc/self/fd`, so plaintext never appears as a directory entry and no staging file survives a `SIGKILL`. The recovered file is given its only name by `linkat(2)` at commit time. Where the filesystem lacks `O_TMPFILE`, the created-then-unlinked inode cannot be re-linked, so its contents are copied to a hidden `0600` temporary beside the output and renamed into place without replacement (*see [Security limitations](#security-limitations)*). The C++ build stages and publishes the same way.
 
 ● **Output images** are not byte-identical between the two builds, because the recovery KEY, the Argon2id salt and the secretstream header are random.
 
@@ -303,6 +329,16 @@ for i = 0 .. min(count, n - 1) - 1:
 ```
 
 The first `count` items are the positions used, in order (*-x: the header's positions, then the payload's, from one shuffle; -r: one shuffle each for header and payload*). Each draw depends on the full 128-bit carrier key. Position draws use their own domain constants, separate from those for whitening and dither, so no position draw reuses a whitening or dither value. This hides *where* the data is. It does not stop statistical steganalysis from detecting that an image carries hidden data.
+
+## Security limitations
+
+***jdvrif-rs*** encrypts and authenticates your data, but some exposure is outside what the program can control:
+
+● **Deleted temporary files are not wiped.** The intermediate files (*compressed, encrypted and decrypted data*) never get a visible name and are released when ***jdvrif-rs*** exits, but releasing a file frees its disk blocks without overwriting them, so the data can stay on the disk until that space is reused. On SSDs, journalling or copy-on-write filesystems, or with snapshots, overwriting would not reliably erase it either. Use full-disk encryption if this matters to you.
+
+● **Memory.** Keys and plaintext buffers are wiped after use, and ***jdvrif-rs*** tries to turn off core dumps for itself and block other processes running as your user from reading its memory (*`PR_SET_DUMPABLE 0` and `RLIMIT_CORE 0`, for that run only*). This is best effort: if the system refuses either setting (*a seccomp filter in a sandbox or container, for example*), ***jdvrif-rs*** prints a warning and carries on without it. It does not lock its memory, so data in use can still be written to swap: use encrypted swap (*or none*) to cover that. A root user can read any process's memory.
+
+● **Interrupted recovery on some filesystems.** Where the filesystem lacks `O_TMPFILE` or hard links, the recovered file is first copied to a hidden `.jdvrif_publish_*.tmp` file (*mode 0600*) beside the output, then renamed into place. If ***jdvrif-rs*** is killed, crashes or loses power during that copy, the hidden file can be left behind holding some or all of the recovered data, so delete it. Ordinary errors and Ctrl+C remove it.
 
 ## Tests
 

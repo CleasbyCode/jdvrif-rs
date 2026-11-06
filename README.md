@@ -32,7 +32,7 @@ The two platform exceptions to the default segment storage method are ***Reddit*
 
 ***Reddit*** re-encodes uploaded images and discards the metadata segments the default mode relies on, so ***-r*** is the only mode that works there. ***X-Twitter*** does preserve a single, small ICC segment, so the default mode still works on that platform, but only for a tiny payload.
 
-For the ***Reddit*** conceal mode (***-r***), we use the [***QIM steganography method***](https://ieeexplore.ieee.org/document/4804513) (*JPEG DCT-domain Quantization Index Modulation*), as this is the only storage method that currently works for ***Reddit***. The cover is transcoded to baseline Q75 4:2:0 and the payload is carried in its luminance DCT blocks.
+For the ***Reddit*** conceal mode (***-r***), we use the [***QIM steganography method***](https://ieeexplore.ieee.org/document/923725) (*JPEG DCT-domain Quantization Index Modulation*), as this is the only storage method that currently works for ***Reddit***. The cover is transcoded to baseline Q75 4:2:0 and the payload is carried in its luminance DCT blocks.
 
 To maximise storage capacity for the ***Reddit*** platform, use a cover image with large dimension sizes, **2048x2048**, **4096x4096**, **8192x8192 (max)**, etc.  
 
